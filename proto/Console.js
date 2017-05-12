@@ -1,3 +1,7 @@
+/*************
+   CONSOLE
+*************/
+
 function Console(props){
   this.createConsole(props);
 }

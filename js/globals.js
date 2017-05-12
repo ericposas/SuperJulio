@@ -1,3 +1,7 @@
+/*************
+   GLOBALS
+*************/
+
 var GLOBALS = {
   char: {
     jumpForce: 0.075,

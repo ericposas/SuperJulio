@@ -1,7 +1,6 @@
-/************
+/*************
  BLOCK TYPES
 *************/
-
 
 // BRICK //
 function Brick(i, o, brick_count){

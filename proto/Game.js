@@ -12,7 +12,7 @@ function Game(){
     engine: this.engine,
     options: {
       wireframes: false,
-      background: Colors.sky2,
+      background: COLORS.sky2,
       width: 480,
       height: 800
     }

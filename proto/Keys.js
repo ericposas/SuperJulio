@@ -1,6 +1,7 @@
-// KEYS //
+/**************************
+ KEY STATES / ASCII CODES
+**************************/
 
-// CONSTANTS 
 const KEYCODES = {
   spacebar : 32,
   leftarrow : 37,
@@ -17,6 +18,9 @@ var KEYSTATES = {
   rightarrow : ''
 }
 
+/**********
+   KEYS
+**********/
 
 function Keys(game){
   this.construct();
@@ -25,20 +29,15 @@ function Keys(game){
 }
 
 Keys.prototype.construct = function(){
-  // Add game area click tester
-  document.getElementById('game-container').addEventListener('click', this.clicktest.bind(this));
-  // Add key up/down detection and state-setting 
   document.body.addEventListener('keydown', this.keysdown.bind(this));
   document.body.addEventListener('keyup', this.keysup.bind(this));
 }
 
-// GAME CONTAINER - CLICK //
-Keys.prototype.clicktest = function(){
-  c.comment('game container -- click.');
-}
 
+/*************
+  KEYS DOWN
+*************/
 
-// ARROW KEYS DOWN //
 Keys.prototype.keysdown = function(e){
   if((e.keyCode == KEYCODES.leftarrow) || (e.keyCode == KEYCODES.a)){
     if(GLOBALS.char.accel.speed > 0 && KEYSTATES.leftarrow != 'down'){
@@ -58,7 +57,10 @@ Keys.prototype.keysdown = function(e){
   }
 }
 
-// ARROW KEYS UP //
+/*************
+   KEYS UP
+*************/
+
 Keys.prototype.keysup = function(e){
   if((e.keyCode == KEYCODES.leftarrow) || (e.keyCode == KEYCODES.a)){
     KEYSTATES.leftarrow = 'up';
@@ -71,6 +73,10 @@ Keys.prototype.keysup = function(e){
     this.game.currentChar.render.sprite.texture = this.game.charSpriteset[0];
   }
 }
+
+/*************
+  PROPERTIES
+*************/
 
 Object.defineProperties(Keys.prototype, {
   game: {

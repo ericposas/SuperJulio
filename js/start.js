@@ -1,3 +1,7 @@
+/*************
+  GAME PAGE
+*************/
+
 window.onload = function(){
   
   // WEB PAGE SET UP

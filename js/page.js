@@ -1,3 +1,7 @@
+/*************
+  PAGE PROPS
+*************/
+
 var page = {
   properties : {},
   setup_gamepage : function(){
