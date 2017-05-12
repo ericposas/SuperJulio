@@ -35,17 +35,41 @@ Game.prototype.start = function(){
   Matter.Render.run(this.render);
   // run game loop
   this.gameLoop();
-  // collision testing 
+  
+  // collision testing for Bricks 
   Matter.Events.on(this.engine, 'collisionStart', function(evt){
     var str = evt.pairs[0].id;
-    if(str.indexOf('brick')){
-      // colliding with a brick instance 
-      _self.charStandingOn = 'brick';
+    if(str.indexOf('brick')){ // if colliding with a brick instance 
+      //get the proper brick 
+      var match = /brick\-(\d{1,})/g.exec(str);
+      var id;
+      if(match && match[1]){ id = parseInt(match[1]) - 1; }
+      if(id != null){
+      var brick = _self.currentLevel.layout[id];
+      if((_self.currentChar.position.y > brick.position.y) &&
+         (_self.currentChar.position.x > brick.position.x - 10) &&
+         (_self.currentChar.position.x < brick.position.x + 35)){
+        c.comment('brick break!');
+        var brick_bits = new MiniBricks(_self.currentChar.position);
+        for(var i = 0; i < brick_bits.length; i+=1){
+          var _x = getRandomInt(-0.001,0.001), _y = getRandomInt(-0.001,-0.002);
+          Matter.World.add(_self.engine.world, brick_bits[i]);
+          Matter.Body.applyForce(brick_bits[i], brick_bits[i].position, {
+            x:_x,
+            y:_y});
+        }
+        _self.removeBody(brick);
+      }else{
+        _self.charJumpState == 'jumping' ? c.comment('standing on brick') : 0;
+        _self.charStandingOn = 'brick';
+      }
       if(KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
         _self.currentChar.render.sprite.texture = _self.charSpriteset[0];
       }
     }
+    }
   });
+  // setting canvas and context in case we want to draw over our scene 
   this.canv = document.getElementsByTagName('canvas')[0];
   this.ctx = this.canv.getContext('2d');
 }
@@ -110,10 +134,10 @@ Game.prototype.testBounds = function (){
 
 Game.prototype.testJump = function(){
   if(this.currentChar.position.y < 738 && this.charStandingOn != 'brick'){
-    this.jumpState = 'jumping';
+    this.charJumpState = 'jumping';
     this.currentChar.render.sprite.texture = this.charSpriteset[2];
   }else{
-    this.jumpState = 'grounded';
+    this.charJumpState = 'grounded';
   }
 }
 
@@ -174,11 +198,11 @@ Game.prototype.swapsprite = function(direction){
     this.charSpriteset = [ 'img/mario01_l.png', 'img/mario02_l.png', 'img/jump_l.png' ];
   }
   // currently switches between two sprites 
-  if(this.jumpState == 'jumping' && this.currentChar.render.sprite.texture != this.charSpriteset[2]){
+  if(this.charJumpState == 'jumping' && this.currentChar.render.sprite.texture != this.charSpriteset[2]){
     this.currentChar.render.sprite.texture = this.charSpriteset[2];
-  }else if(this.spritei > GLOBALS.char.spriteswap.frames_per_state && this.jumpState != 'jumping'){
+  }else if(this.spritei > GLOBALS.char.spriteswap.frames_per_state && this.charJumpState != 'jumping'){
     this.currentChar.render.sprite.texture = this.charSpriteset[1];
-  }else if(this.spritei < GLOBALS.char.spriteswap.frames_per_state && this.jumpState != 'jumping'){
+  }else if(this.spritei < GLOBALS.char.spriteswap.frames_per_state && this.charJumpState != 'jumping'){
     this.currentChar.render.sprite.texture = this.charSpriteset[0];
   }
   
@@ -224,7 +248,7 @@ Game.prototype.decel = function (direction){
 
 Game.prototype.jump = function(){
   // apply jump force to character 
-  if(this.jumpState != 'jumping'){
+  if(this.charJumpState != 'jumping'){
     Matter.Body.applyForce(this.currentChar, this.currentChar.position, {x:0,y:(GLOBALS.char.jumpForce*-1)});
     this.charStandingOn = 'nothing';
   }
@@ -372,12 +396,12 @@ Object.defineProperties(Game.prototype, {
       return this._charRightBounds;
     }
   },
-  jumpState: {
+  charJumpState: {
     set: function(val){
-      this._jumpState = val;
+      this._charJumpState = val;
     },
     get: function(){
-      return this._jumpState;
+      return this._charJumpState;
     }
   },
   charStandingOn: {

@@ -10,8 +10,8 @@ function Character(i, o){
     render: {
       fillStyle: '#FF0000',
       sprite: {
-        xScale:0.8,
-        yScale:0.8,
+        xScale:0.9,
+        yScale:0.9,
         texture: 'img/mario01.png'
       }
     }

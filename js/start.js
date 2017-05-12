@@ -5,7 +5,7 @@
 window.onload = function(){
   
   // WEB PAGE SET UP
-  page.properties.title = 'Matter.js Test 02';
+  page.properties.title = 'Super Julio';
   page.setup_gamepage();
   
   // DEBUGGING CONSOLE 

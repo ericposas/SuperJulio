@@ -19,6 +19,26 @@ function Brick(i, o, brick_count){
   return brick;
 }
 
+// MINI-BRICKS //
+function MiniBricks(pos){
+  var mini_bricks = [];
+  for(var n = 0; n < 5; n+=1){
+    var mini_brick = Matter.Bodies.rectangle(pos.x, pos.y, 10, 10, {
+      //id: 'mini-brick',
+      friction: 0,
+        render: {
+          sprite: {
+            xScale:0.1,
+            yScale:0.1,
+            texture: 'img/brick_200x200.png'
+          }
+        }
+    });
+    mini_bricks.push(mini_brick);
+  }
+  return mini_bricks;
+}
+
 // BOX //
 function Box(i, o, box_count){
   var box = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 40, 40, {
