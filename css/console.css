@@ -1,0 +1,24 @@
+#console-title{
+  width: 800px;
+  font-family: 'Arial';
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 6px;
+}
+
+/* console window */
+#window{
+  overflow: scroll;
+  border: 1px solid darkgray;
+  border-radius: 4px;
+}
+
+.comment{
+  margin-top: 4px;
+  margin-left: 4px;
+  font-family: 'Arial';
+  font-size: 12px;
+  /* font-weight: bold; */
+  color: darkgray
+}
+
