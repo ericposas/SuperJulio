@@ -16,6 +16,7 @@ window.onload = function(){
   var game = new Game();
   var keys = new Keys(game);
   game.addLevel(lvl1);
+  //var collisions = new Collisions(game);
   game.start();
   game.w = 480;
   game.h = 800;

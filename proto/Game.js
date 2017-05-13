@@ -36,37 +36,43 @@ Game.prototype.start = function(){
   // run game loop
   this.gameLoop();
   
-  // collision testing for Bricks 
+  // collisions  
   Matter.Events.on(this.engine, 'collisionStart', function(evt){
     var str = evt.pairs[0].id;
-    if(str.indexOf('brick')){ // if colliding with a brick instance 
+    // if char_id is colliding with a brick instance 
+    if(str.indexOf('brick') && str.indexOf(_self.currentChar.id)){ 
       //get the proper brick 
-      var match = /brick\-(\d{1,})/g.exec(str);
       var id;
+      var match = /brick\-(\d{1,})/g.exec(str);
       if(match && match[1]){ id = parseInt(match[1]) - 1; }
       if(id != null){
       var brick = _self.currentLevel.layout[id];
-      if((_self.currentChar.position.y > brick.position.y) &&
-         (_self.currentChar.position.x > brick.position.x - 10) &&
+      if((_self.currentChar.position.y > brick.position.y + 18) &&
+         (_self.currentChar.position.x > brick.position.x) &&
          (_self.currentChar.position.x < brick.position.x + 35)){
-        c.comment('brick break!');
-        var brick_bits = new MiniBricks(_self.currentChar.position);
-        for(var i = 0; i < brick_bits.length; i+=1){
-          var _x = getRandomInt(-0.001,0.001), _y = getRandomInt(-0.001,-0.002);
-          Matter.World.add(_self.engine.world, brick_bits[i]);
-          Matter.Body.applyForce(brick_bits[i], brick_bits[i].position, {
-            x:_x,
-            y:_y});
+          c.comment('brick break!');
+          var mini_bricks = [];
+          for(var i = 0; i < 4 /*brick_bits.length*/; i+=1){
+            mini_bricks[i] = new MiniBrick(_self.currentChar.position);
+            var _x = getRandomInt(-0.001,0.002), _y = getRandomInt(-0.001,-0.002);
+            Matter.World.add(_self.engine.world, mini_bricks[i]);
+            Matter.Body.applyForce(mini_bricks[i], mini_bricks[i].position, {
+              x:_x,
+              y:_y});
+            Matter.Body.rotate(mini_bricks[i], getRandomInt(0.1, 5.0));
+            TweenLite.delayedCall(0.5, function(){
+              Matter.World.remove(_self.engine.world, mini_bricks);
+            });
+          }
+          _self.removeBody(brick);
+        }else{
+          _self.charJumpState == 'jumping' ? c.comment('standing on brick') : 0;
+          _self.charStandingOn = 'brick';
         }
-        _self.removeBody(brick);
-      }else{
-        _self.charJumpState == 'jumping' ? c.comment('standing on brick') : 0;
-        _self.charStandingOn = 'brick';
+        if(KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
+          _self.currentChar.render.sprite.texture = _self.charSpriteset[0];
+        }
       }
-      if(KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
-        _self.currentChar.render.sprite.texture = _self.charSpriteset[0];
-      }
-    }
     }
   });
   // setting canvas and context in case we want to draw over our scene 
@@ -160,6 +166,13 @@ Game.prototype.scroll = function (){
     }
   }
 }
+
+
+/*************
+  COLLISIONS
+*************/
+
+
 
 
 /*************

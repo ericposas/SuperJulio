@@ -19,6 +19,22 @@ function Brick(i, o, brick_count){
   return brick;
 }
 
+function MiniBrick(pos){
+  var mini_brick = Matter.Bodies.rectangle(pos.x, pos.y-10, 10, 10, {
+      //id: 'mini-brick',
+      restitution: 0.5,
+      friction: 0,
+        render: {
+          sprite: {
+            xScale:0.1,
+            yScale:0.1,
+            texture: 'img/brick_200x200.png'
+          }
+        }
+    });
+  return mini_brick;
+}
+
 // MINI-BRICKS //
 function MiniBricks(pos){
   var mini_bricks = [];
