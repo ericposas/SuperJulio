@@ -145,34 +145,15 @@ Game.prototype.collisions = function(){
     // if char_id is colliding with a brick instance 
     if(str.indexOf('brick') && str.indexOf(_self.currentChar.id)){ 
       //get the proper brick 
-      var id;
-      var match = /brick\-(\d{1,})/g.exec(str);
-      if(match && match[1]){ id = parseInt(match[1]) - 1; }
+      var id = _self.getBrickID(str);
       if(id != null){
-      var brick = _self.currentLevel.layout[id];
-      if((_self.currentChar.position.y > brick.position.y + 20) &&
-         (_self.currentChar.position.x > brick.position.x - 22) &&
-         (_self.currentChar.position.x < brick.position.x + 36)){ 
+        var brick = _self.currentLevel.layout[id];
+        if(_self.checkCharIsUnderBrick(brick)){ 
           c.comment('brick break!');
-          //c.comment('char:' + _self.currentChar.position.x + ', brick: ' + brick.position.x);
-          var mini_bricks = [];
-          for(var i = 0; i < 4 /*brick_bits.length*/; i+=1){
-            mini_bricks[i] = new MiniBrick(_self.currentChar.position);
-            var _x = getRandomInt(-0.0001,0.01), _y = getRandomInt(-0.005, 0.00);
-            Matter.World.add(_self.engine.world, mini_bricks[i]);
-            Matter.Body.applyForce(mini_bricks[i], mini_bricks[i].position, {
-              x:_x,
-              y:_y});
-            Matter.Body.rotate(mini_bricks[i], getRandomInt(1, 50));
-            // remove mini-bricks after a small delay 
-            TweenLite.delayedCall(1.5, function(){
-              Matter.World.remove(_self.engine.world, mini_bricks);
-            });
-          }
-          _self.removeBody(brick);
+          _self.brickBreak(brick);
         }else{
-          //_self.charJumpState == 'jumping' ? c.comment('standing on brick') : 0;
-          c.comment('standing on brick');
+          //if we didn't break a brick, our character must be on top of the brick instead 
+          _self.charJumpState == 'jumping' ? c.comment('standing on brick') : 0;
           _self.charStandingOn = 'brick';
         }
         if(KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
@@ -183,7 +164,41 @@ Game.prototype.collisions = function(){
   });
 }
 
+Game.prototype.brickBreak = function(brick){
+  var mini_bricks = [],
+      _self = this,
+      x_range = [-0.002, -0.001, 0, 0.001, 0.002],
+      y_range = [-0.005, -0.004, -0.003, -0.002, -0.001];
+  for(var i = 0; i < 4; i+=1){
+    mini_bricks[i] = new MiniBrick(this.currentChar.position);
+    var _x = x_range[getRandomInt(0,x_range.length-1)],
+        _y = y_range[getRandomInt(0,y_range.length-1)];
+    Matter.World.add(this.engine.world, mini_bricks[i]);
+    Matter.Body.applyForce(mini_bricks[i], mini_bricks[i].position, {x:_x,y:_y});
+    Matter.Body.rotate(mini_bricks[i], getRandomInt(1, 50));
+    TweenLite.delayedCall(1.5, function(){
+      Matter.World.remove(_self.engine.world, mini_bricks);
+    });
+  }
+  this.removeBody(brick);
+}
 
+Game.prototype.checkCharIsUnderBrick = function(brick){
+  if((this.currentChar.position.y > brick.position.y + 20) &&
+     (this.currentChar.position.x > brick.position.x - 22) &&
+     (this.currentChar.position.x < brick.position.x + 36)){
+    return true;
+  }else{
+    return false;
+  }
+}
+
+Game.prototype.getBrickID = function(str){
+  var match = /brick\-(\d{1,})/g.exec(str);
+  if(match && match[1]){
+    return (parseInt(match[1]) - 1);
+  }
+}
 
 
 /*************
@@ -440,6 +455,14 @@ Object.defineProperties(Game.prototype, {
     },
     get: function(){
       return this._charSpriteset;
+    }
+  },
+  charIsUnderBrick: {
+    set: function(val){
+      this._charIsUnderBrick = val;
+    },
+    get: function(){
+      return this._charIsUnderBrick;
     }
   },
   spritei: {
