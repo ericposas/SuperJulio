@@ -8,7 +8,7 @@
   
   ### Need to do:
     - Need to increment the speed in his run/walk cycle 
-    - Need to read up more on the Collision Filters documentation (Matter.js)
+    - Need to read up more on the Collision Filters documentation (Matter.js) -- Collision issue had to do with checking the wrong array set.. instead of checking the entire "layout" array, I needed to check the "bricks" array. This fact, was throwing off the Body ID's and causing issues with the collision detection 
     
   ### Preloading 
     - Will use PreloadJS (CreateJS library) to preload assets 
