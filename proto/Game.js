@@ -3,7 +3,6 @@
 *************/
 
 function Game(){
-  var _self = this;
   // create an engine
   this.engine = Matter.Engine.create();
   // create a renderer
@@ -35,46 +34,8 @@ Game.prototype.start = function(){
   Matter.Render.run(this.render);
   // run game loop
   this.gameLoop();
-  
   // collisions  
-  Matter.Events.on(this.engine, 'collisionStart', function(evt){
-    var str = evt.pairs[0].id;
-    // if char_id is colliding with a brick instance 
-    if(str.indexOf('brick') && str.indexOf(_self.currentChar.id)){ 
-      //get the proper brick 
-      var id;
-      var match = /brick\-(\d{1,})/g.exec(str);
-      if(match && match[1]){ id = parseInt(match[1]) - 1; }
-      if(id != null){
-      var brick = _self.currentLevel.layout[id];
-      if((_self.currentChar.position.y > brick.position.y + 18) &&
-         (_self.currentChar.position.x > brick.position.x) &&
-         (_self.currentChar.position.x < brick.position.x + 35)){
-          c.comment('brick break!');
-          var mini_bricks = [];
-          for(var i = 0; i < 4 /*brick_bits.length*/; i+=1){
-            mini_bricks[i] = new MiniBrick(_self.currentChar.position);
-            var _x = getRandomInt(-0.001,0.002), _y = getRandomInt(-0.001,-0.002);
-            Matter.World.add(_self.engine.world, mini_bricks[i]);
-            Matter.Body.applyForce(mini_bricks[i], mini_bricks[i].position, {
-              x:_x,
-              y:_y});
-            Matter.Body.rotate(mini_bricks[i], getRandomInt(0.1, 5.0));
-            TweenLite.delayedCall(0.5, function(){
-              Matter.World.remove(_self.engine.world, mini_bricks);
-            });
-          }
-          _self.removeBody(brick);
-        }else{
-          _self.charJumpState == 'jumping' ? c.comment('standing on brick') : 0;
-          _self.charStandingOn = 'brick';
-        }
-        if(KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
-          _self.currentChar.render.sprite.texture = _self.charSpriteset[0];
-        }
-      }
-    }
-  });
+  this.collisions();
   // setting canvas and context in case we want to draw over our scene 
   this.canv = document.getElementsByTagName('canvas')[0];
   this.ctx = this.canv.getContext('2d');
@@ -171,6 +132,56 @@ Game.prototype.scroll = function (){
 /*************
   COLLISIONS
 *************/
+
+var CollisionCategories = {
+  brick_default : 0x0001,
+  mini_brick : 0x0002
+}
+
+Game.prototype.collisions = function(){
+  var _self = this;
+  Matter.Events.on(this.engine, 'collisionStart', function(evt){
+    var str = evt.pairs[0].id;
+    // if char_id is colliding with a brick instance 
+    if(str.indexOf('brick') && str.indexOf(_self.currentChar.id)){ 
+      //get the proper brick 
+      var id;
+      var match = /brick\-(\d{1,})/g.exec(str);
+      if(match && match[1]){ id = parseInt(match[1]) - 1; }
+      if(id != null){
+      var brick = _self.currentLevel.layout[id];
+      if((_self.currentChar.position.y > brick.position.y + 20) &&
+         (_self.currentChar.position.x > brick.position.x - 22) &&
+         (_self.currentChar.position.x < brick.position.x + 36)){ 
+          c.comment('brick break!');
+          //c.comment('char:' + _self.currentChar.position.x + ', brick: ' + brick.position.x);
+          var mini_bricks = [];
+          for(var i = 0; i < 4 /*brick_bits.length*/; i+=1){
+            mini_bricks[i] = new MiniBrick(_self.currentChar.position);
+            var _x = getRandomInt(-0.0001,0.01), _y = getRandomInt(-0.005, 0.00);
+            Matter.World.add(_self.engine.world, mini_bricks[i]);
+            Matter.Body.applyForce(mini_bricks[i], mini_bricks[i].position, {
+              x:_x,
+              y:_y});
+            Matter.Body.rotate(mini_bricks[i], getRandomInt(1, 50));
+            // remove mini-bricks after a small delay 
+            TweenLite.delayedCall(1.5, function(){
+              Matter.World.remove(_self.engine.world, mini_bricks);
+            });
+          }
+          _self.removeBody(brick);
+        }else{
+          //_self.charJumpState == 'jumping' ? c.comment('standing on brick') : 0;
+          c.comment('standing on brick');
+          _self.charStandingOn = 'brick';
+        }
+        if(KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
+          _self.currentChar.render.sprite.texture = _self.charSpriteset[0];
+        }
+      }
+    }
+  });
+}
 
 
 
@@ -306,7 +317,6 @@ Object.defineProperties(Game.prototype, {
       return this._name;
     }
   },
-  // canvas element 
   canv: {
     set: function(val){
       this._canv = val;
@@ -315,7 +325,6 @@ Object.defineProperties(Game.prototype, {
       return this._canv;
     }
   },
-  // canvas 2D context
   ctx: {
     set: function(val){
       this._ctx = val;

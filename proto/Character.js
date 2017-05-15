@@ -5,6 +5,9 @@
 function Character(i, o){
   var char = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 40, 40, {
     //id: 'character',
+    /* collisionFilter: {
+      category: CollisionCategories.character
+    }, */
     inertia: Infinity,
     friction: 0,
     render: {
