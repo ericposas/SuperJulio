@@ -7,10 +7,12 @@ function Sounds(){
   //this.jump = new Audio('sfx/smb_jump_small.wav');
   // trying Howler.js library 
   this.brick_break = new Howl({
-    src: ['sfx/smb_breakblock.wav']
+    src: ['sfx/smb_breakblock.wav'],
+    volume: 0.5
   });
   this.jump = new Howl({
-    src: ['sfx/smb_jump_small.wav']
+    src: ['sfx/smb_jump_small.wav'],
+    volume: 0.75
   })
   
 }
