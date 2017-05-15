@@ -6,8 +6,8 @@ var GLOBALS = {
   char: {
     jumpForce: 0.075,
     spriteswap: {
-      frames_per_state: 2,
-      total_frames: 4 
+      //frames_per_state: 2,
+      total_frames: 6
     },
     accel: {
       speed: 0,

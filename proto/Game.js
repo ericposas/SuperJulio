@@ -147,6 +147,7 @@ Game.prototype.collisions = function(){
   Matter.Events.on(this.engine, 'collisionStart', function(evt){
     var str = evt.pairs[0].id;
     // if char_id is colliding with a brick instance 
+    c.comment(str);
     if(str.indexOf('brick') && str.indexOf(_self.currentChar.id)){ 
       //get the proper brick 
       var id = _self.getBrickID(str);
@@ -244,9 +245,9 @@ Game.prototype.swapsprite = function(direction){
   // currently switches between two sprites 
   if(this.charJumpState == 'jumping' && this.currentChar.render.sprite.texture != this.charSpriteset[2]){
     this.currentChar.render.sprite.texture = this.charSpriteset[2];
-  }else if(this.spritei > GLOBALS.char.spriteswap.frames_per_state && this.charJumpState != 'jumping'){
+  }else if(this.spritei > GLOBALS.char.spriteswap.total_frames/2 && this.charJumpState != 'jumping'){
     this.currentChar.render.sprite.texture = this.charSpriteset[1];
-  }else if(this.spritei < GLOBALS.char.spriteswap.frames_per_state && this.charJumpState != 'jumping'){
+  }else if(this.spritei < GLOBALS.char.spriteswap.total_frames/2 && this.charJumpState != 'jumping'){
     this.currentChar.render.sprite.texture = this.charSpriteset[0];
   }
   
@@ -482,6 +483,7 @@ Object.defineProperties(Game.prototype, {
       return this._charIsUnderBrick;
     }
   },
+  // amount of frames per walkcycle 
   spritei: {
     set: function(val){
       this._spritei = val;

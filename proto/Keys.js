@@ -65,12 +65,12 @@ Keys.prototype.keysup = function(e){
   if((e.keyCode == KEYCODES.leftarrow) || (e.keyCode == KEYCODES.a)){
     KEYSTATES.leftarrow = 'up';
     this.game.decelerate('right');
-    this.game.currentChar.render.sprite.texture = this.game.charSpriteset[0];
+    //this.game.currentChar.render.sprite.texture = this.game.charSpriteset[0];
   }
   if((e.keyCode == KEYCODES.rightarrow) || (e.keyCode == KEYCODES.d)){
     KEYSTATES.rightarrow = 'up';
     this.game.decelerate('left');
-    this.game.currentChar.render.sprite.texture = this.game.charSpriteset[0];
+    //this.game.currentChar.render.sprite.texture = this.game.charSpriteset[0];
   }
 }
 

@@ -9,7 +9,7 @@ function Level(level){
   return {
     name:this.name,
     layout:layout,
-    boxes:this.boxes,
+    fricks:this.fricks,
     bricks:this.bricks,
     char:this.character,
     rows:this.rows
@@ -18,7 +18,6 @@ function Level(level){
 
 Level.prototype.layout = function(rows){
   var blocks = [];
-  var frick_count = 0;
   var brick_count = 0;
   // build level layout based on grid passed in 
   for(var i = 0; i < rows.length; i++){ 
@@ -28,12 +27,6 @@ Level.prototype.layout = function(rows){
         var brick = new Brick(i,o,brick_count);
         this.bricks.push(brick);
         blocks.push(brick);
-      }
-      if(rows[i][o] == 2){
-        frick_count+=1;
-        var frick = new FauxBrick(i,o,frick_count);
-        this.fricks.push(frick);
-        blocks.push(frick);
       }
       if(rows[i][o] == 'c'){
         this.character = new Character(i,o);

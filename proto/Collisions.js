@@ -25,7 +25,7 @@ Collisions.prototype.init = function(){
         _self.game.charStandingOn = 'brick';
       }
       if(KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
-        _self.game.currentChar.render.sprite.texture = _self.game.charSpriteset[0];
+        _self.game.charTexture = _self.game.charSpriteset[0];
       }
     }
   });

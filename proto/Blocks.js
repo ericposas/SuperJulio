@@ -22,25 +22,8 @@ function Brick(i, o, brick_count){
   return brick;
 }
 
-// FAUX-BRICK // #2
-function FauxBrick(i, o, brick_count){
-  var brick = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 40, 40, {
-    id: 'frick-'+brick_count,
-    collisionFilter: {
-      category: CollisionCategories.brick_default
-    },
-    isStatic: true,
-    friction: 0,
-    render: {
-      sprite: {
-        xScale:0.2,
-        yScale:0.2,
-        texture: 'img/brick_200x200.png'
-      }
-    }
-  });
-  return brick;
-}
+
+
 
 // MINI BRICK //
 function MiniBrick(pos){
