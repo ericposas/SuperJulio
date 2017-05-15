@@ -3,6 +3,10 @@
 *************/
 
 function Game(){
+  // class objects for private variable access 
+  this.sounds = new Sounds();
+  //this.sounds.play('brick');
+  
   // create an engine
   this.engine = Matter.Engine.create();
   // create a renderer
@@ -165,6 +169,7 @@ Game.prototype.collisions = function(){
 }
 
 Game.prototype.brickBreak = function(brick){
+  this.sounds.play('brick');
   var mini_bricks = [],
       _self = this,
       x_range = [-0.002, -0.001, 0, 0.001, 0.002],
@@ -288,6 +293,7 @@ Game.prototype.decel = function (direction){
 Game.prototype.jump = function(){
   // apply jump force to character 
   if(this.charJumpState != 'jumping'){
+    this.sounds.play('jump');
     Matter.Body.applyForce(this.currentChar, this.currentChar.position, {x:0,y:(GLOBALS.char.jumpForce*-1)});
     this.charStandingOn = 'nothing';
   }
@@ -332,6 +338,16 @@ Object.defineProperties(Game.prototype, {
       return this._name;
     }
   },
+  // private variables
+  sounds: {
+    set: function(val){
+      this._sounds = val;
+    },
+    get: function(){
+      return this._sounds;
+    }
+  },
+  // HTML5 canvas element
   canv: {
     set: function(val){
       this._canv = val;
@@ -340,6 +356,7 @@ Object.defineProperties(Game.prototype, {
       return this._canv;
     }
   },
+  // canvas element 2D context 
   ctx: {
     set: function(val){
       this._ctx = val;
