@@ -2,12 +2,12 @@
  BLOCK TYPES
 *************/
 
-// BRICK // #1
+// BRICK // 1
 function Brick(i, o, brick_count){
   var brick = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 40, 40, {
     id: 'brick-'+brick_count,
     collisionFilter: {
-      category: CollisionCategories.brick_default
+      category: CollisionCategories.brick
     },
     isStatic: true,
     friction: 0,
@@ -22,7 +22,25 @@ function Brick(i, o, brick_count){
   return brick;
 }
 
-
+// QUESTION BLOCK // '?'
+function Qblock(i, o, _count){
+  var qblock = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 40, 40, {
+    id: 'qblock-'+_count,
+    collisionFilter: {
+      category: CollisionCategories.qblock
+    },
+    isStatic: true,
+    friction: 0,
+    render: {
+      sprite: {
+        xScale:0.4,
+        yScale:0.4,
+        texture: 'img/qblock_100x100.png'
+      }
+    }
+  });
+  return qblock;
+}
 
 
 // MINI BRICK //
@@ -51,7 +69,7 @@ function Box(i, o, box_count){
   var box = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 40, 40, {
     id: 'box-'+box_count,
     collisionFilter: {
-      category: CollisionCategories.brick_default
+      category: CollisionCategories.brick
     },
     render: {
       sprite: {

@@ -138,8 +138,9 @@ Game.prototype.scroll = function (){
 *************/
 
 var CollisionCategories = {
-  brick_default : 0x0001,
-  mini_brick : 0x0002
+  brick : 0x0001,
+  mini_brick : 0x0002,
+  qblock : 0x0003
 }
 
 Game.prototype.collisions = function(){
@@ -147,22 +148,24 @@ Game.prototype.collisions = function(){
   Matter.Events.on(this.engine, 'collisionStart', function(evt){
     var str = evt.pairs[0].id;
     // if char_id is colliding with a brick instance 
-    c.comment(str);
-    if(str.indexOf('brick') && str.indexOf(_self.currentChar.id)){ 
-      //get the proper brick 
-      var id = _self.getBrickID(str);
-      if(id != null){
-        var brick = _self.currentLevel.layout[id];
-        if(_self.checkCharIsUnderBrick(brick)){ 
-          c.comment('brick break!');
-          _self.brickBreak(brick);
-        }else{
-          //if we didn't break a brick, our character must be on top of the brick instead 
-          _self.charJumpState == 'jumping' ? c.comment('standing on brick') : 0;
-          _self.charStandingOn = 'brick';
-        }
-        if(KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
-          _self.currentChar.render.sprite.texture = _self.charSpriteset[0];
+    //c.comment(str);
+    if(str.indexOf(_self.currentChar.id)){
+      // check for breakable brick 
+      if(str.indexOf('brick')){
+        var id = _self.getBrickID(str);
+        if(id != null){
+          var brick = _self.currentLevel.bricks[id];
+          if(_self.checkCharIsUnderBrick(brick)){ 
+            c.comment('brick break!');
+            _self.brickBreak(brick);
+          }else{
+            //if we didn't break a brick, our character must be on top of the brick instead 
+            _self.charJumpState == 'jumping' ? c.comment('standing on brick') : 0;
+            _self.charStandingOn = 'brick';
+          }
+          if(KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
+            _self.currentChar.render.sprite.texture = _self.charSpriteset[0];
+          }
         }
       }
     }
@@ -229,12 +232,20 @@ Game.prototype.movechar = function(direction){
   }
   this.swapsprite(direction);
   if(this.leftBounds == true || this.rightBounds == true){
-    x_translate = (direction == 'right' ? (GLOBALS.char.accel.speed) : ((GLOBALS.char.accel.speed)*-1));
+    this.char_x_translate = (direction == 'right' ? (GLOBALS.char.accel.speed) : ((GLOBALS.char.accel.speed)*-1));
   }else{
-    x_translate = (direction == 'right' ? 0 : 0);
+    this.char_x_translate = (direction == 'right' ? 0 : 0);
   }
-  Matter.Body.translate(this.currentChar, {x:x_translate, y:-1});
+  Matter.Body.translate(this.currentChar, {x:this.char_x_translate, y:-1});
 }
+Object.defineProperty(Game.prototype, 'char_x_translate', {
+  set: function(val){
+    this._char_x_translate = val;
+  },
+  get: function(){
+    return this._char_x_translate;
+  }
+});
 // Swap game character sprite 
 Game.prototype.swapsprite = function(direction){
   if(direction == 'right'){

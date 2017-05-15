@@ -4,9 +4,10 @@
 
 window.onload = function(){
   
-  // WEB PAGE SET UP
+  // WEB PAGE SET UP (sets elements of the webpage on top of canvas element) 
   page.properties.title = 'Super Julio';
   page.setup_gamepage();
+  //page.append_brick_break_counter();
   
   // DEBUGGING CONSOLE 
   window.c = new Console({w:480,h:800});
@@ -21,6 +22,7 @@ window.onload = function(){
   game.w = 480;
   game.h = 800;
   game.name = "Super Julio";
+  
   
 }
 
