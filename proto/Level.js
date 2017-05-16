@@ -116,7 +116,7 @@ Object.defineProperties(Level.prototype, {
     },
     get: function(){
       if(!this._character){
-        c.comment('No character has been set.');
+        //c.comment('No character has been set.');
       }
       return this._character;
     }

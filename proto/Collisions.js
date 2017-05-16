@@ -21,7 +21,7 @@ Collisions.prototype.init = function(){
         var brick = _self.game.currentLevel.layout[id];
         _self.checkBrickBreak(brick);
       }else{
-        _self.game.charJumpState == 'jumping' ? c.comment('standing on brick') : 0;
+        _self.game.charJumpState == 'jumping' ? //c.comment('standing on brick') : 0;
         _self.game.charStandingOn = 'brick';
       }
       if(KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
@@ -36,7 +36,7 @@ Collisions.prototype.checkBrickBreak = function(brick){
   if((this.game.currentChar.position.y > brick.position.y + 18) &&
      (this.game.currentChar.position.x > brick.position.x) &&
      (this.game.currentChar.position.x < brick.position.x + 35)){
-    c.comment('brick break!');
+    //c.comment('brick break!');
     var mini_bricks = [];
     for(var i = 0; i < 4; i+=1){
       mini_bricks[i] = new MiniBrick(this.game.currentChar.position);

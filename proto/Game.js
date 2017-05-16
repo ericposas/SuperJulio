@@ -13,7 +13,7 @@ function Game(){
     engine: this.engine,
     options: {
       wireframes: false,
-      background: COLORS.sky2,
+      background: 'transparent', //COLORS.sky2,
       width: 480,
       height: 800
     }
@@ -201,7 +201,7 @@ Game.prototype.qblockCheck = function(str){
     if(id != null){
       var qblock = _self.currentLevel.qblocks[id];
       if(_self.checkCharIsUnderBrick(qblock)){ 
-        c.comment('hit a Q-block!');
+        //c.comment('hit a Q-block!');
         _self.qBlockHit(qblock);
       }else{
         _self.charStandingOn = 'qblock';
@@ -217,7 +217,7 @@ Game.prototype.brickCheck = function(str){
     if(id != null){
       var brick = _self.currentLevel.bricks[id];
       if(_self.checkCharIsUnderBrick(brick)){ 
-        c.comment('brick break!');
+        //c.comment('brick break!');
         _self.brickBreak(brick);
       }else{
         _self.charStandingOn = 'brick';
@@ -233,7 +233,7 @@ Game.prototype.frickCheck = function(str){
     if(id != null){
       var frick = _self.currentLevel.fricks[id];
       if(_self.checkCharIsUnderBrick(frick)){ 
-        c.comment('Fake brick hit!');
+        //c.comment('Fake brick hit!');
         _self.qBlockHit(frick);
       }else{
         _self.charStandingOn = 'frick';

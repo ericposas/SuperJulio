@@ -4,13 +4,16 @@
 
 window.onload = function(){
   
+  //initialize Adobe Animate background canvas 
+  init();
+  
   // WEB PAGE SET UP (sets elements of the webpage on top of canvas element) 
   page.properties.title = 'Super Julio';
   page.setup_gamepage();
   //page.append_brick_break_counter();
   
   // DEBUGGING CONSOLE 
-  window.c = new Console({w:480,h:800});
+  //window.c = new Console({w:480,h:800});
   
   // GAME SET UP
   var lvl1 = new Level(Levels.level1);
@@ -23,7 +26,6 @@ window.onload = function(){
   game.h = 800;
   game.name = "Super Julio";
   
-  c.comment(lvl1.qblocks);
   
 }
 

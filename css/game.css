@@ -1,7 +1,11 @@
+#game-container{
+  position: relative;
+}
+
 canvas{
-  min-width: 100%;
+  /* min-width: 100%; */
   max-width: 100%;
-  display: block;
+  position: absolute;
   margin-left: auto;
   margin-right: auto;
 }
@@ -13,4 +17,10 @@ canvas{
   position: absolute;
   background-color: black;
 } */
+
+/* #background-canvas{
+  background-color: aqua;
+  z-index: -1;
+} */
+
 
