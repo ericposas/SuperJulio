@@ -6,10 +6,6 @@
 function Brick(i, o, brick_count){
   var brick = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 40, 40, {
     id: 'brick-'+brick_count,
-    collisionFilter: {
-      //category: CollisionCategories.brick
-      //mask: CollisionCategories.mini_brick
-    },
     isStatic: true,
     friction: 0,
     render: {
@@ -24,12 +20,9 @@ function Brick(i, o, brick_count){
 }
 
 // FAUX BRICK // 2
-function FauxBrick(i, o, brick_count){
-  var brick = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 40, 40, {
-    id: 'brick-'+brick_count,
-    collisionFilter: {
-      category: CollisionCategories.brick
-    },
+function FauxBrick(i, o, _count){
+  var frick = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 40, 40, {
+    id: 'frick-'+_count,
     isStatic: true,
     friction: 0,
     render: {
@@ -40,17 +33,23 @@ function FauxBrick(i, o, brick_count){
       }
     }
   });
-  return brick;
+  return frick;
 }
+Object.defineProperties(FauxBrick.prototype, {
+  state: {
+    set: function(val){
+      this._state = val;
+    },
+    get: function(){
+      return this._state;
+    }
+  }
+});
 
 // QUESTION BLOCK // '?'
 function Qblock(i, o, _count){
   var qblock = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 40, 40, {
     id: 'qblock-'+_count,
-    collisionFilter: {
-      //category: CollisionCategories.qblock,
-      //mask: CollisionCategories.mini_brick
-    },
     isStatic: true,
     friction: 0,
     render: {
@@ -80,7 +79,6 @@ function MiniBrick(pos){
   var mini_brick = Matter.Bodies.rectangle(pos.x, pos.y-10, 10, 10, {
       //id: 'mini',
       collisionFilter: {
-        //category: CollisionCategories.masked
         mask: CollisionCategories.masked 
       },
       restitution: 0.5,
