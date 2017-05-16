@@ -3,7 +3,7 @@
 *************/
 
 function Character(i, o){
-  var char = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 38, 38, {
+  var char = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 28, 38, {
     id: 'character',
     inertia: Infinity,
     friction: 0,

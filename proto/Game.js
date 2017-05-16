@@ -5,8 +5,6 @@
 function Game(){
   // class objects for private variable access 
   this.sounds = new Sounds();
-  //this.sounds.play('brick');
-  
   // create an engine
   this.engine = Matter.Engine.create();
   // create a renderer
@@ -104,7 +102,7 @@ Game.prototype.testBounds = function (){
 }
 
 Game.prototype.testJump = function(){
-  if(this.currentChar.position.y < 738 && this.charStandingOn != 'brick'){
+  if(this.currentChar.position.y < 738 && this.charStandingOn != 'brick' && this.charStandingOn != 'qblock'){
     this.charJumpState = 'jumping';
     this.currentChar.render.sprite.texture = this.charSpriteset[2];
   }else{
@@ -138,9 +136,11 @@ Game.prototype.scroll = function (){
 *************/
 
 var CollisionCategories = {
-  brick : 0x0001,
-  mini_brick : 0x0002,
-  qblock : 0x0003
+  //brick : 0x0001,
+  //mini_brick : 0x0002,
+  //qblock : 0x0004,
+  //char : 0x0008
+  masked : 0x0002
 }
 
 Game.prototype.collisions = function(){
@@ -150,6 +150,9 @@ Game.prototype.collisions = function(){
     if(str.indexOf(_self.currentChar.id)){
       _self.brickCheck(str);
       _self.qblockCheck(str);
+      if(KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
+        _self.currentChar.render.sprite.texture = _self.charSpriteset[0];
+      }
     }
   });
 }
@@ -162,15 +165,11 @@ Game.prototype.qblockCheck = function(str){
       var qblock = _self.currentLevel.qblocks[id];
       if(_self.checkCharIsUnderBrick(qblock)){ 
         c.comment('hit a Q-block!');
-        _self.sounds.play('bump');
-        //_self.brickBreak(brick);
+        _self.qBlockHit(qblock);
+        return true;
       }else{
-        //if we didn't break a brick, our character must be on top of the brick instead 
         _self.charJumpState == 'jumping' ? c.comment('standing on Q-block') : 0;
         _self.charStandingOn = 'qblock';
-      }
-      if(KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
-        _self.currentChar.render.sprite.texture = _self.charSpriteset[0];
       }
     }
   }
@@ -185,16 +184,40 @@ Game.prototype.brickCheck = function(str){
       if(_self.checkCharIsUnderBrick(brick)){ 
         c.comment('brick break!');
         _self.brickBreak(brick);
+        return true;
       }else{
         //if we didn't break a brick, our character must be on top of the brick instead 
         _self.charJumpState == 'jumping' ? c.comment('standing on brick') : 0;
         _self.charStandingOn = 'brick';
       }
-      if(KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
-        _self.currentChar.render.sprite.texture = _self.charSpriteset[0];
-      }
     }
   }
+}
+
+Game.prototype.qBlockHit = function(qb){
+  var frames = 10, rate = 0.0075;
+  this.sounds.play('bump');
+  if(qb.state != 'hit'){
+    animateBlock();
+  }
+  function animateBlock(){
+    for(var i = 0; i < frames; i++){
+      var d = (i*rate);
+      TweenLite.delayedCall(d, function(){
+        Matter.Body.translate(qb, {x:0,y:-1});
+      });
+    }
+    TweenLite.delayedCall((frames*rate), function(){
+      for(var i = 0; i < frames; i++){
+        var d = (i*rate);
+        TweenLite.delayedCall(d, function(){
+          Matter.Body.translate(qb, {x:0,y:1});
+        });
+      }
+      qb.render.sprite.texture = 'img/empty_block_100x100.png';
+    });
+  }
+  qb.state = 'hit';
 }
 
 Game.prototype.brickBreak = function(brick){

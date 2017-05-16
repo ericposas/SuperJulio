@@ -4,7 +4,7 @@
 
 var GLOBALS = {
   char: {
-    jumpForce: 0.07,
+    jumpForce: 0.05,
     spriteswap: {
       //frames_per_state: 2,
       total_frames: 6

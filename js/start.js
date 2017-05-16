@@ -23,6 +23,7 @@ window.onload = function(){
   game.h = 800;
   game.name = "Super Julio";
   
+  c.comment(lvl1.qblocks);
   
 }
 

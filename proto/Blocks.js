@@ -7,6 +7,27 @@ function Brick(i, o, brick_count){
   var brick = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 40, 40, {
     id: 'brick-'+brick_count,
     collisionFilter: {
+      //category: CollisionCategories.brick
+      //mask: CollisionCategories.mini_brick
+    },
+    isStatic: true,
+    friction: 0,
+    render: {
+      sprite: {
+        xScale:0.2,
+        yScale:0.2,
+        texture: 'img/brick_200x200.png'
+      }
+    }
+  });
+  return brick;
+}
+
+// FAUX BRICK // 2
+function FauxBrick(i, o, brick_count){
+  var brick = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 40, 40, {
+    id: 'brick-'+brick_count,
+    collisionFilter: {
       category: CollisionCategories.brick
     },
     isStatic: true,
@@ -27,7 +48,8 @@ function Qblock(i, o, _count){
   var qblock = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 40, 40, {
     id: 'qblock-'+_count,
     collisionFilter: {
-      category: CollisionCategories.qblock
+      //category: CollisionCategories.qblock,
+      //mask: CollisionCategories.mini_brick
     },
     isStatic: true,
     friction: 0,
@@ -41,6 +63,16 @@ function Qblock(i, o, _count){
   });
   return qblock;
 }
+Object.defineProperties(Qblock.prototype, {
+  state: {
+    set: function(val){
+      this._state = val;
+    },
+    get: function(){
+      return this._state;
+    }
+  }
+});
 
 
 // MINI BRICK //
@@ -48,8 +80,8 @@ function MiniBrick(pos){
   var mini_brick = Matter.Bodies.rectangle(pos.x, pos.y-10, 10, 10, {
       //id: 'mini',
       collisionFilter: {
-        category: CollisionCategories.mini_brick,
-        mask: CollisionCategories.mini_brick
+        //category: CollisionCategories.masked
+        mask: CollisionCategories.masked 
       },
       restitution: 0.5,
       friction: 0,
@@ -68,9 +100,7 @@ function MiniBrick(pos){
 function Box(i, o, box_count){
   var box = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 40, 40, {
     id: 'box-'+box_count,
-    collisionFilter: {
-      category: CollisionCategories.brick
-    },
+    collisionFilter: {},
     render: {
       sprite: {
         xScale:0.2,

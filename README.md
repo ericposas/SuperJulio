@@ -3,7 +3,8 @@
   Mario-clone project, using Matter.js.. There will be violence 
   
   ### Known issues:
-    - Julio can scale an entire wall if right next to it, and holding down the jump key 
+    - Julio can scale an entire wall if right next to it, and holding down the jump key - FIXED 
+    - Julio can still execute an infinite-jump if close enough to a block (triggers collision and resets the jump-check?)
     - Julio stops walking motion, if he reaches the scrolling boundary, but not touching a wall 
   
   ### Need to do:
