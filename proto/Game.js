@@ -146,30 +146,55 @@ var CollisionCategories = {
 Game.prototype.collisions = function(){
   var _self = this;
   Matter.Events.on(this.engine, 'collisionStart', function(evt){
-    var str = evt.pairs[0].id;
-    // if char_id is colliding with a brick instance 
-    //c.comment(str);
+    var str = evt.pairs[0].id; //get collision pairs 
     if(str.indexOf(_self.currentChar.id)){
-      // check for breakable brick 
-      if(str.indexOf('brick')){
-        var id = _self.getBrickID(str);
-        if(id != null){
-          var brick = _self.currentLevel.bricks[id];
-          if(_self.checkCharIsUnderBrick(brick)){ 
-            c.comment('brick break!');
-            _self.brickBreak(brick);
-          }else{
-            //if we didn't break a brick, our character must be on top of the brick instead 
-            _self.charJumpState == 'jumping' ? c.comment('standing on brick') : 0;
-            _self.charStandingOn = 'brick';
-          }
-          if(KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
-            _self.currentChar.render.sprite.texture = _self.charSpriteset[0];
-          }
-        }
-      }
+      _self.brickCheck(str);
+      _self.qblockCheck(str);
     }
   });
+}
+
+Game.prototype.qblockCheck = function(str){
+  var _self = this;
+  if(str.indexOf('qblock')){
+    var id = _self.getQBlockID(str);
+    if(id != null){
+      var qblock = _self.currentLevel.qblocks[id];
+      if(_self.checkCharIsUnderBrick(qblock)){ 
+        c.comment('hit a Q-block!');
+        _self.sounds.play('bump');
+        //_self.brickBreak(brick);
+      }else{
+        //if we didn't break a brick, our character must be on top of the brick instead 
+        _self.charJumpState == 'jumping' ? c.comment('standing on Q-block') : 0;
+        _self.charStandingOn = 'qblock';
+      }
+      if(KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
+        _self.currentChar.render.sprite.texture = _self.charSpriteset[0];
+      }
+    }
+  }
+}
+
+Game.prototype.brickCheck = function(str){
+  var _self = this;
+  if(str.indexOf('brick')){
+    var id = _self.getBrickID(str);
+    if(id != null){
+      var brick = _self.currentLevel.bricks[id];
+      if(_self.checkCharIsUnderBrick(brick)){ 
+        c.comment('brick break!');
+        _self.brickBreak(brick);
+      }else{
+        //if we didn't break a brick, our character must be on top of the brick instead 
+        _self.charJumpState == 'jumping' ? c.comment('standing on brick') : 0;
+        _self.charStandingOn = 'brick';
+      }
+      if(KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
+        _self.currentChar.render.sprite.texture = _self.charSpriteset[0];
+      }
+    }
+  }
 }
 
 Game.prototype.brickBreak = function(brick){
@@ -194,11 +219,18 @@ Game.prototype.brickBreak = function(brick){
 
 Game.prototype.checkCharIsUnderBrick = function(brick){
   if((this.currentChar.position.y > brick.position.y + 22) &&
-     (this.currentChar.position.x > brick.position.x - 20) &&
+     (this.currentChar.position.x > brick.position.x - 22) &&
      (this.currentChar.position.x < brick.position.x + 35)){
     return true;
   }else{
     return false;
+  }
+}
+
+Game.prototype.getQBlockID = function(str){
+  var match = /qblock\-(\d{1,})/g.exec(str);
+  if(match && match[1]){
+    return (parseInt(match[1]) - 1);
   }
 }
 
