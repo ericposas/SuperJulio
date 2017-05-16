@@ -193,9 +193,9 @@ Game.prototype.brickBreak = function(brick){
 }
 
 Game.prototype.checkCharIsUnderBrick = function(brick){
-  if((this.currentChar.position.y > brick.position.y + 20) &&
-     (this.currentChar.position.x > brick.position.x - 22) &&
-     (this.currentChar.position.x < brick.position.x + 36)){
+  if((this.currentChar.position.y > brick.position.y) &&
+     (this.currentChar.position.x > brick.position.x - 20) &&
+     (this.currentChar.position.x < brick.position.x + 35)){
     return true;
   }else{
     return false;
