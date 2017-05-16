@@ -12,6 +12,7 @@ function Level(level){
     qblocks:this.qblocks,
     bricks:this.bricks,
     fricks:this.fricks,
+    coins:this.coins,
     char:this.character,
     rows:this.rows
   };
@@ -22,6 +23,7 @@ Level.prototype.layout = function(rows){
   var brick_count = 0;
   var qblock_count = 0;
   var frick_count = 0;
+  var coin_count = 0;
   // build level layout based on grid passed in 
   for(var i = 0; i < rows.length; i++){ 
     for(var o = 0; o < rows[i].length; o++){
@@ -42,6 +44,12 @@ Level.prototype.layout = function(rows){
         var qblock = new Qblock(i,o,qblock_count);
         this.qblocks.push(qblock);
         blocks.push(qblock);
+      }
+      if(rows[i][o] == 'o'){
+        coin_count+=1;
+        var coin = new Coin(i,o,coin_count);
+        this.coins.push(coin);
+        blocks.push(coin);
       }
       if(rows[i][o] == 'c'){
         this.character = new Character(i,o);
@@ -68,6 +76,14 @@ Object.defineProperties(Level.prototype, {
         this._boxes = [];
       }
       return this._boxes;
+    }
+  },
+  coins: {
+    get: function(){
+      if(!this._coins){
+        this._coins = [];
+      }
+      return this._coins;
     }
   },
   qblocks: {

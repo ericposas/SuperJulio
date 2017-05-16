@@ -102,7 +102,7 @@ Game.prototype.testBounds = function (){
 }
 
 Game.prototype.testJump = function(){
-  if(this.currentChar.position.y < 738 && this.charStandingOn != 'brick' && this.charStandingOn != 'qblock'){
+  if(this.currentChar.position.y < 738 && this.isCharStandingOnAnything() == false){
     this.charJumpState = 'jumping';
     this.currentChar.render.sprite.texture = this.charSpriteset[2];
   }else{
@@ -130,6 +130,14 @@ Game.prototype.scroll = function (){
   }
 }
 
+Game.prototype.isCharStandingOnAnything = function(){
+  if(this.charStandingOn != 'brick' && this.charStandingOn != 'qblock' && this.charStandingOn != 'frick'){
+    return false;
+  }else{
+    return true;
+  }
+}
+
 
 /*************
   COLLISIONS
@@ -152,10 +160,37 @@ Game.prototype.collisions = function(){
       _self.brickCheck(str);
       _self.qblockCheck(str);
       _self.frickCheck(str);
+      _self.coinCheck(str);
     }
     if(KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
       _self.currentChar.render.sprite.texture = _self.charSpriteset[0];
     }
+  });
+}
+
+Game.prototype.coinCheck = function(str){
+  var _self = this;
+  if(str.indexOf('coin')){
+    var id = _self.getCoinID(str);
+    if(id != null){
+      var coin = _self.currentLevel.coins[id];
+      _self.coinGet(coin);
+    }
+  }
+} 
+
+Game.prototype.coinGet = function(coin){
+  this.sounds.play('coin');
+  this.removeBody(coin);
+}
+
+Game.prototype.blockCoinPop = function(pos){
+  var coin = new BlockCoin(pos),
+      _self = this;
+  this.addBody(coin);
+  Matter.Body.applyForce(coin, coin.position, {x:0,y:-0.02});
+  TweenLite.delayedCall(1.25, function(){
+    _self.removeBody(coin);
   });
 }
 
@@ -213,6 +248,7 @@ Game.prototype.qBlockHit = function(qb){
     this.sounds.play('coin');
     this.sounds.play('bump');
     animateBlock();
+    this.blockCoinPop(qb.position);
     qb.state = 'hit';
   }else{
     this.sounds.play('bump');
@@ -265,6 +301,13 @@ Game.prototype.checkCharIsUnderBrick = function(brick){
     return true;
   }else{
     return false;
+  }
+}
+
+Game.prototype.getCoinID = function(str){
+  var match = /coin\-(\d{1,})/g.exec(str);
+  if(match && match[1]){
+    return (parseInt(match[1]) - 1);
   }
 }
 
