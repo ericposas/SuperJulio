@@ -1,8 +1,3 @@
-/*************************
- DON'T DELETE THIS COMMENT
-*************************/
-//BE SURE TO INCLUE bg_objects(); after handleFileLoad(evt)!!!! 
-
 var canvas, stage, exportRoot;
 function init() {
 	canvas = document.getElementById("canvas");
@@ -63,3 +58,4 @@ function handleComplete(evt) {
 	})(true,'width',false,2);
   bg_objects();
 }
+

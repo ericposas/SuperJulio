@@ -26,6 +26,12 @@ var GLOBALS = {
       begin: 58,
       end: 422
     }
+  },
+  bg: {
+    limit: {
+      left: 0,
+      right: 925
+    }
   }
   
 }

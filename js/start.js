@@ -17,7 +17,7 @@ window.onload = function(){
   
   // GAME SET UP
   var lvl1 = new Level(Levels.level1);
-  var game = new Game();
+  window.game = new Game();
   var keys = new Keys(game);
   game.addLevel(lvl1);
   //var collisions = new Collisions(game);

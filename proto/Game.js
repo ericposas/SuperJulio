@@ -19,7 +19,7 @@ function Game(){
     }
   });
   // initial sprite set 
-  this.charSpriteset = [ 'img/mario01.png', 'img/mario02.png', 'img/jump.png' ];
+  this.charSpriteset = this.sm_sprites_r;
   if(!this.spritei){ this.spritei = 0; }
 }
 
@@ -337,11 +337,17 @@ Game.prototype.getFrickID = function(str){
    MOVEMENT
 *************/
 
-// Move stage bodies (bricks/boxes/etc.) 
+// Move stage bodies (bricks/boxes/etc.) ..testing bg image scroll 
 Game.prototype.move = function (direction){
   this.increaseSpeed();
   for(var i = 0; i < this.currentLevel.layout.length; i++){
     Matter.Body.translate(this.currentLevel.layout[i], {x:(direction == 'right' ? GLOBALS.char.accel.speed : (GLOBALS.char.accel.speed*-1)), y:0});
+  }
+  // scroll the bg image in the background canvas element 
+  if(direction == 'right' && this.bg.x < -10){
+    this.bg.x++;
+  }else{
+    this.bg.x--;
   }
 }
 
@@ -372,9 +378,9 @@ Object.defineProperty(Game.prototype, 'char_x_translate', {
 // Swap game character sprite 
 Game.prototype.swapsprite = function(direction){
   if(direction == 'right'){
-    this.charSpriteset = [ 'img/mario01.png', 'img/mario02.png', 'img/jump.png' ];
+    this.charSpriteset = this.sm_sprites_r;
   }else{
-    this.charSpriteset = [ 'img/mario01_l.png', 'img/mario02_l.png', 'img/jump_l.png' ];
+    this.charSpriteset = this.sm_sprites_l;
   }
   // currently switches between two sprites 
   if(this.charJumpState == 'jumping' && this.currentChar.render.sprite.texture != this.charSpriteset[2]){
@@ -601,6 +607,14 @@ Object.defineProperties(Game.prototype, {
       return this._charStandingOn;
     }
   },
+  charIsUnderBrick: {
+    set: function(val){
+      this._charIsUnderBrick = val;
+    },
+    get: function(){
+      return this._charIsUnderBrick;
+    }
+  },
   charSpriteset: {
     set: function(val){
       this._charSpriteset = val;
@@ -609,12 +623,24 @@ Object.defineProperties(Game.prototype, {
       return this._charSpriteset;
     }
   },
-  charIsUnderBrick: {
-    set: function(val){
-      this._charIsUnderBrick = val;
-    },
+  sm_sprites_r: {
     get: function(){
-      return this._charIsUnderBrick;
+      return [ 'img/small/mario01.png', 'img/small/mario02.png', 'img/small/jump.png' ];
+    }
+  },
+  sm_sprites_l: {
+    get: function(){
+      return [ 'img/small/mario01_l.png', 'img/small/mario02_l.png', 'img/small/jump_l.png' ];
+    }
+  },
+  big_sprites_r: {
+    get: function(){
+      return [ 'img/big/big_mario01.png', 'img/big/big_mario02.png', 'img/big/big_mario_jump.png' ];
+    }
+  },
+  big_sprites_l: {
+    get: function(){
+      return [ 'img/big/big_mario01_l.png', 'img/big/big_mario02_l.png', 'img/big/big_mario_jump_l.png' ];
     }
   },
   // amount of frames per walkcycle 
@@ -624,6 +650,14 @@ Object.defineProperties(Game.prototype, {
     },
     get: function(){
       return this._spritei;
+    }
+  },
+  bg: {
+    set: function(val){
+      this._bg = val;
+    },
+    get: function(){
+      return this._bg;
     }
   }
 });
