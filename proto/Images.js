@@ -3,6 +3,7 @@
 **********/
 
 var Images = {
+  mario : 'img/small/mario01.png',
   coin : 'img/items/coin_200x200.png',
   brick : 'img/items/brick_200x200.png',
   qblock : 'img/items/qblock_100x100.png',

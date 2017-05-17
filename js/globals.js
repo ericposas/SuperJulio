@@ -5,7 +5,7 @@
 var GLOBALS = {
   char: {
     gamestart: {
-      delay: 0.25
+      delay: 0.5
     },
     jumpForce: {
       current: 0.05,

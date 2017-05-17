@@ -47,9 +47,11 @@ Object.defineProperties(FauxBrick.prototype, {
 });
 
 // QUESTION BLOCK // '?'
-function Qblock(i, o, _count){
-  var qblock = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 40, 40, {
-    id: 'qblock-'+_count,
+function Qblock(i, o, _count, option){
+  var x = (o*40)+20;
+      y = (i*40)+20;
+  var qblock = Matter.Bodies.rectangle(x, y, 40, 40, {
+    id: (option == 'p' ? 'pblock-' : 'qblock-') + _count,
     isStatic: true,
     friction: 0,
     render: {
@@ -60,6 +62,7 @@ function Qblock(i, o, _count){
       }
     }
   });
+  this.position = {x:x, y:y};
   return qblock;
 }
 Object.defineProperties(Qblock.prototype, {
@@ -69,6 +72,14 @@ Object.defineProperties(Qblock.prototype, {
     },
     get: function(){
       return this._state;
+    }
+  },
+  shroom: {
+    set: function(val){
+      this._shroom;
+    },
+    get: function(){
+      return this._shroom;
     }
   }
 });

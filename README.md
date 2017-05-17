@@ -7,7 +7,9 @@
     - Julio can still execute an infinite-jump if close enough to a block (triggers collision and resets the jump-check?)
     - Julio stops walking motion, if he reaches the scrolling boundary, but not touching a wall 
   
-  ### Need to do:
+  ### Need to do: 
+    - REFACTOR!!! 
+    - Need to refactor Collisions section of Game.js badly 
     - Need to increment the speed in his run/walk cycle 
     - Need to read up more on the Collision Filters documentation (Matter.js) -- Collision issue had to do with checking the wrong array set.. instead of checking the entire "layout" array, I needed to check the "bricks" array. This fact, was throwing off the Body ID's and causing issues with the collision detection 
     

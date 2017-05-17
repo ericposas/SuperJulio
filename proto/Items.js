@@ -2,6 +2,23 @@
    ITEMS
 **********/
 
+// SHROOM POWER-UP (FROM BLOCK) //
+function Shroom(pos, _count){
+  var shroom = Matter.Bodies.rectangle(pos.x, pos.y, 40, 40, {
+      id: 'shroom-'+_count,
+      restitution: 0.5,
+      friction: 0,
+        render: {
+          sprite: {
+            xScale:0.2,
+            yScale:0.2,
+            texture: Images.mushroom
+          }
+        }
+    });
+  return shroom;
+}
+
 // MUSHROOM //
 function Mushroom(i, o, _count){
   var mushroom = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 40, 40, {

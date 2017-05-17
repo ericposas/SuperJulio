@@ -27,5 +27,17 @@ window.onload = function(){
   game.name = "Super Julio";
   //game.addCharacter();
   
+  for(var i = 0; i < game.currentLevel.shrooms.length; i++){
+    console.log(game.currentLevel.shrooms[i].id);
+    console.log(game.currentLevel.shrooms[i].position);
+  }
+  
+  (function(){
+    for(var i = 0; i < game.currentLevel.mushrooms.length; i++){
+      //console.log(game.currentLevel.mushrooms[i].id);
+      //console.log(game.currentLevel.shrooms[i].position);
+    }
+  })();
+  
 }
 

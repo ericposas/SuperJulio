@@ -163,9 +163,11 @@ Game.prototype.collisions = function(){
     if(_self.currentChar && (str.indexOf(_self.currentChar.id))){
       _self.brickCheck(str);
       _self.qblockCheck(str);
+      _self.pblockCheck(str);
       _self.frickCheck(str);
       _self.coinCheck(str);
-      _self.shroomCheck(str);
+      //_self.shroomCheck(str);
+      _self.mushroomCheck(str);
     }
     if(_self.currentChar && KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
       _self.currentChar.render.sprite.texture = _self.charSpriteset[0];
@@ -173,16 +175,23 @@ Game.prototype.collisions = function(){
   });
 }
 
+Game.prototype.mushroomCheck = function(str){
+  var _self = this;
+  var id = _self.getMushroomID(str);
+  if(id != null){
+    var shroom = _self.currentLevel.mushrooms[id];
+    _self.shroomGet(shroom);
+  }
+}
+
 Game.prototype.shroomCheck = function(str){
   var _self = this;
-  if(str.indexOf('mushroom')){
-    var id = _self.getShroomID(str);
-    if(id != null){
-      var shroom = _self.currentLevel.shrooms[id];
-      _self.shroomGet(shroom);
-    }
+  var id = _self.getShroomID(str);
+  if(id != null){
+    var shroom = _self.currentLevel.shrooms[id];
+    _self.shroomGet(shroom);
   }
-} 
+}
 
 Game.prototype.shroomGet = function(shroom){
   this.currentChar.state = CHAR_BIG;
@@ -218,6 +227,17 @@ Game.prototype.blockCoinPop = function(pos){
   });
 }
 
+Game.prototype.shroomPopOut = function(block){
+  var _self = this;
+  if(block){
+    TweenLite.delayedCall(0, function(){
+      Matter.Body.translate(block.shroom, {x:0, y:40});
+      //console.log(block.shroom.position);
+    });
+  }
+  //Matter.Body.applyForce(shroom, shroom.position, {x:0,y:-0.005});
+}
+
 Game.prototype.qblockCheck = function(str){
   var _self = this;
   if(str.indexOf('qblock')){
@@ -225,8 +245,22 @@ Game.prototype.qblockCheck = function(str){
     if(id != null){
       var qblock = _self.currentLevel.qblocks[id];
       if(_self.checkCharIsUnderBrick(qblock)){ 
-        //c.comment('hit a Q-block!');
         _self.qBlockHit(qblock);
+      }else{
+        _self.charStandingOn = 'qblock';
+      }
+    }
+  }
+}
+
+Game.prototype.pblockCheck = function(str){
+  var _self = this;
+  if(str.indexOf('pblock')){
+    var id = _self.getPBlockID(str);
+    if(id != null){
+      var pblock = _self.currentLevel.pblocks[id];
+      if(_self.checkCharIsUnderBrick(pblock)){ 
+        _self.qBlockHit(pblock, 'p');
       }else{
         _self.charStandingOn = 'qblock';
       }
@@ -266,13 +300,19 @@ Game.prototype.frickCheck = function(str){
   }
 }
 
-Game.prototype.qBlockHit = function(qb){
+Game.prototype.qBlockHit = function(qb, option){
   var frames = 10, rate = 0.0075;
   if(qb.state != 'hit'){
-    this.sounds.play('coin');
+    console.log(qb.id);
+    if(option == 'p'){
+      this.sounds.play('powerup_appears');
+      this.shroomPopOut(qb);
+    }else{
+      this.sounds.play('coin');
+      this.blockCoinPop(qb.position);
+    }
     this.sounds.play('bump');
     animateBlock();
-    this.blockCoinPop(qb.position);
     qb.state = 'hit';
   }else{
     this.sounds.play('bump');
@@ -329,6 +369,13 @@ Game.prototype.checkCharIsUnderBrick = function(brick){
 }
 
 Game.prototype.getShroomID = function(str){
+  var match = /shroom\-(\d{1,})/g.exec(str);
+  if(match && match[1]){
+    return (parseInt(match[1]) - 1);
+  }
+}
+
+Game.prototype.getMushroomID = function(str){
   var match = /mushroom\-(\d{1,})/g.exec(str);
   if(match && match[1]){
     return (parseInt(match[1]) - 1);
@@ -344,6 +391,13 @@ Game.prototype.getCoinID = function(str){
 
 Game.prototype.getQBlockID = function(str){
   var match = /qblock\-(\d{1,})/g.exec(str);
+  if(match && match[1]){
+    return (parseInt(match[1]) - 1);
+  }
+}
+
+Game.prototype.getPBlockID = function(str){
+  var match = /pblock\-(\d{1,})/g.exec(str);
   if(match && match[1]){
     return (parseInt(match[1]) - 1);
   }
@@ -400,7 +454,7 @@ Game.prototype.move = function (direction){
 // Move character 
 Game.prototype.movechar = function(direction){
   this.charFacing = direction;
-  console.log(this.charFacing);
+  //console.log(this.charFacing);
   this.increaseSpeed();
   if(this.spritei < GLOBALS.char.spriteswap.total_frames){
     this.spritei++;
@@ -483,10 +537,18 @@ Game.prototype.decel = function (direction){
 
 Game.prototype.jump = function(){
   // apply jump force to character 
-  if(this.charJumpState != 'jumping'){
-    this.sounds.play('jump');
+  if(this.currentChar && this.charJumpState != 'jumping'){
+    this.playJumpSnd();
     Matter.Body.applyForce(this.currentChar, this.currentChar.position, {x:0,y:(GLOBALS.char.jumpForce.current*-1)});
     this.charStandingOn = 'nothing';
+  }
+}
+
+Game.prototype.playJumpSnd = function(){
+  if(this.currentChar.state == CHAR_BIG){
+    this.sounds.play('big_jump');
+  }else{
+    this.sounds.play('jump');
   }
 }
 

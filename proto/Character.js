@@ -22,8 +22,8 @@ function Character(i, o){
       fillStyle: '#FF0000',
       sprite: {
         xScale:0.9,
-        yScale:0.9 //,
-        //texture: 'img/mario01.png'
+        yScale:0.9,
+        texture: Images.mario
       }
     }
   });

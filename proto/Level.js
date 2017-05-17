@@ -10,9 +10,11 @@ function Level(level){
     name:this.name,
     layout:layout,
     qblocks:this.qblocks,
+    pblocks:this.pblocks,
     bricks:this.bricks,
     fricks:this.fricks,
     coins:this.coins,
+    mushrooms:this.mushrooms,
     shrooms:this.shrooms,
     char:this.character,
     rows:this.rows
@@ -23,8 +25,10 @@ Level.prototype.layout = function(rows){
   var blocks = [];
   var brick_count = 0;
   var qblock_count = 0;
+  var pblock_count = 0;
   var frick_count = 0;
   var coin_count = 0;
+  var mushroom_count = 0;
   var shroom_count = 0;
   // build level layout based on grid passed in 
   for(var i = 0; i < rows.length; i++){ 
@@ -47,17 +51,28 @@ Level.prototype.layout = function(rows){
         this.qblocks.push(qblock);
         blocks.push(qblock);
       }
+      if(rows[i][o] == '?p'){
+        pblock_count+=1;
+        shroom_count+=1;
+        var pblock = new Qblock(i,o,pblock_count,'p');
+        this.pblocks.push(pblock);
+        var shroom = new Shroom({x:pblock.position.x,y:-100}, shroom_count); //place offscreen somewhere 
+        this.shrooms.push(shroom);
+        pblock.shroom = shroom;
+        blocks.push(pblock);
+        blocks.push(shroom);
+      }
+      if(rows[i][o] == 'm'){
+        mushroom_count+=1;
+        var mushroom = new Mushroom(i,o,mushroom_count);
+        this.mushrooms.push(mushroom);
+        blocks.push(mushroom);
+      }
       if(rows[i][o] == 'o'){
         coin_count+=1;
         var coin = new Coin(i,o,coin_count);
         this.coins.push(coin);
         blocks.push(coin);
-      }
-      if(rows[i][o] == 'm'){
-        shroom_count+=1;
-        var shroom = new Mushroom(i,o,shroom_count);
-        this.shrooms.push(shroom);
-        blocks.push(shroom);
       }
       if(rows[i][o] == 'c'){
         this.character = new Character(i,o);
@@ -102,12 +117,28 @@ Object.defineProperties(Level.prototype, {
       return this._shrooms;
     }
   },
+  mushrooms: {
+    get: function(){
+      if(!this._mushrooms){
+        this._mushrooms = [];
+      }
+      return this._mushrooms;
+    }
+  },
   qblocks: {
     get: function(){
       if(!this._qblocks){
         this._qblocks = [];
       }
       return this._qblocks;
+    }
+  },
+  pblocks: {
+    get: function(){
+      if(!this._pblocks){
+        this._pblocks = [];
+      }
+      return this._pblocks;
     }
   },
   fricks: {

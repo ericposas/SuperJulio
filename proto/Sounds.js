@@ -11,6 +11,10 @@ function Sounds(){
     src: ['sfx/smb_jump_small.wav'],
     volume: 0.75
   });
+  this.big_jump = new Howl({
+    src: ['sfx/smb_jump_super.wav'],
+    volume: 0.75
+  });
   this.bump = new Howl({
     src: ['sfx/smb_bump.wav'],
     volume: 0.75
@@ -37,6 +41,9 @@ Sounds.prototype.play = function(sndName){
     case 'jump':
       this.jump.play();
       break;
+    case 'big_jump':
+      this.big_jump.play();
+      break;
     case 'bump':
       this.bump.play();
       break;
@@ -59,6 +66,14 @@ Object.defineProperties(Sounds.prototype, {
     },
     get: function(){
       return this._brick_break;
+    }
+  },
+  big_jump: {
+    set: function(val){
+      this._big_jump = val;
+    },
+    get: function(){
+      return this._big_jump;
     }
   },
   jump: {
