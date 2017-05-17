@@ -4,6 +4,7 @@
 
 function Game(){
   // class objects for private variable access 
+  //this.images = new Images();
   this.sounds = new Sounds();
   // create an engine
   this.engine = Matter.Engine.create();
@@ -19,7 +20,9 @@ function Game(){
     }
   });
   // initial sprite set 
-  this.charSpriteset = this.sm_sprites_r;
+  this.sprites_r = this.sm_sprites_r;
+  this.sprites_l = this.sm_sprites_l;
+  this.charSpriteset = this.sprites_r;
   if(!this.spritei){ this.spritei = 0; }
 }
 
@@ -81,7 +84,8 @@ Game.prototype.testBounds = function (){
   }else{
     this.leftBounds = true;
   }
-  if((this.currentLevel) &&
+  if((this.currentChar) &&
+     (this.currentLevel) &&
      (this.currentLevel.bricks[this.currentLevel.bricks.length-1].position.x > this.w - GLOBALS.stage.adjust) &&
      (this.currentChar.position.x > GLOBALS.char.walklimit.left)){
     this.rightBounds = false;
@@ -102,7 +106,7 @@ Game.prototype.testBounds = function (){
 }
 
 Game.prototype.testJump = function(){
-  if(this.currentChar.position.y < 738 && this.isCharStandingOnAnything() == false){
+  if(this.currentChar && this.currentChar.position.y < 738 && this.isCharStandingOnAnything() == false){
     this.charJumpState = 'jumping';
     this.currentChar.render.sprite.texture = this.charSpriteset[2];
   }else{
@@ -156,16 +160,36 @@ Game.prototype.collisions = function(){
   Matter.Events.on(this.engine, 'collisionStart', function(evt){
     var str = evt.pairs[0].id; //get collision pairs 
     // check for various block/brick collisions 
-    if(str.indexOf(_self.currentChar.id)){
+    if(_self.currentChar && (str.indexOf(_self.currentChar.id))){
       _self.brickCheck(str);
       _self.qblockCheck(str);
       _self.frickCheck(str);
       _self.coinCheck(str);
+      _self.shroomCheck(str);
     }
-    if(KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
+    if(_self.currentChar && KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
       _self.currentChar.render.sprite.texture = _self.charSpriteset[0];
     }
   });
+}
+
+Game.prototype.shroomCheck = function(str){
+  var _self = this;
+  if(str.indexOf('mushroom')){
+    var id = _self.getShroomID(str);
+    if(id != null){
+      var shroom = _self.currentLevel.shrooms[id];
+      _self.shroomGet(shroom);
+    }
+  }
+} 
+
+Game.prototype.shroomGet = function(shroom){
+  this.currentChar.state = CHAR_BIG;
+  this.sounds.play('powerup');
+  this.removeBody(shroom);
+  this.characterGrow();
+  console.log(this.currentChar.state);
 }
 
 Game.prototype.coinCheck = function(str){
@@ -218,7 +242,7 @@ Game.prototype.brickCheck = function(str){
       var brick = _self.currentLevel.bricks[id];
       if(_self.checkCharIsUnderBrick(brick)){ 
         //c.comment('brick break!');
-        _self.brickBreak(brick);
+        _self.currentChar.state == CHAR_BIG ? _self.brickBreak(brick) : _self.sounds.play('bump');
       }else{
         _self.charStandingOn = 'brick';
       }
@@ -269,7 +293,7 @@ Game.prototype.qBlockHit = function(qb){
       }
       qb.render.sprite.xScale = 0.4;
       qb.render.sprite.yScale = 0.4;
-      qb.render.sprite.texture = 'img/empty_block_100x100.png';
+      qb.render.sprite.texture = Images.empty_block;
     });
   }
 }
@@ -304,6 +328,13 @@ Game.prototype.checkCharIsUnderBrick = function(brick){
   }
 }
 
+Game.prototype.getShroomID = function(str){
+  var match = /mushroom\-(\d{1,})/g.exec(str);
+  if(match && match[1]){
+    return (parseInt(match[1]) - 1);
+  }
+}
+
 Game.prototype.getCoinID = function(str){
   var match = /coin\-(\d{1,})/g.exec(str);
   if(match && match[1]){
@@ -332,6 +363,21 @@ Game.prototype.getFrickID = function(str){
   }
 }
 
+/*************
+    POWERS
+*************/
+
+Game.prototype.characterGrow = function(){
+  this.sprites_l = this.big_sprites_l;
+  this.sprites_r = this.big_sprites_r;
+  this.charFacing == 'right' ? this.charSpriteset = this.sprites_r : this.charSpriteset = this.sprites_l;
+  this.currentChar.render.sprite.xScale = 0.5;
+  this.currentChar.render.sprite.yScale = 0.5;
+  GLOBALS.char.jumpForce.current = GLOBALS.char.jumpForce.big;
+  //Matter.Body.setInertia(this.currentChar, Infinity);
+  //Matter.Body.scale(this.currentChar, 1, 2.25);
+}
+
 
 /*************
    MOVEMENT
@@ -353,6 +399,8 @@ Game.prototype.move = function (direction){
 
 // Move character 
 Game.prototype.movechar = function(direction){
+  this.charFacing = direction;
+  console.log(this.charFacing);
   this.increaseSpeed();
   if(this.spritei < GLOBALS.char.spriteswap.total_frames){
     this.spritei++;
@@ -366,6 +414,8 @@ Game.prototype.movechar = function(direction){
     this.char_x_translate = (direction == 'right' ? 0 : 0);
   }
   Matter.Body.translate(this.currentChar, {x:this.char_x_translate, y:-1});
+  //this.currentChar.angularVelocity = 0;
+  //Matter.Body.rotate(this.currentChar, 0);
 }
 Object.defineProperty(Game.prototype, 'char_x_translate', {
   set: function(val){
@@ -378,9 +428,9 @@ Object.defineProperty(Game.prototype, 'char_x_translate', {
 // Swap game character sprite 
 Game.prototype.swapsprite = function(direction){
   if(direction == 'right'){
-    this.charSpriteset = this.sm_sprites_r;
+    this.charSpriteset = this.sprites_r;
   }else{
-    this.charSpriteset = this.sm_sprites_l;
+    this.charSpriteset = this.sprites_l;
   }
   // currently switches between two sprites 
   if(this.charJumpState == 'jumping' && this.currentChar.render.sprite.texture != this.charSpriteset[2]){
@@ -435,7 +485,7 @@ Game.prototype.jump = function(){
   // apply jump force to character 
   if(this.charJumpState != 'jumping'){
     this.sounds.play('jump');
-    Matter.Body.applyForce(this.currentChar, this.currentChar.position, {x:0,y:(GLOBALS.char.jumpForce*-1)});
+    Matter.Body.applyForce(this.currentChar, this.currentChar.position, {x:0,y:(GLOBALS.char.jumpForce.current*-1)});
     this.charStandingOn = 'nothing';
   }
 }
@@ -444,6 +494,10 @@ Game.prototype.jump = function(){
 /*************
   ADD BODIES
 *************/
+
+/*Game.prototype.addCharacter = function(){
+  this.currentChar = new Character();
+}*/
 
 Game.prototype.addBody = function(body){
   Matter.World.add(this.engine.world, body);
@@ -455,10 +509,15 @@ Game.prototype.removeBody = function(body){
 
 // Adds the specified level layout and sets the Game object's currentLevel to the new level in order to access that level's objects (boxes/bricks) -- Level layout is a multi-dimensional array 
 Game.prototype.addLevel = function(lvl){
+  var _self = this;
   Matter.World.add(this.engine.world, lvl.layout);
   this.currentLevel = lvl;
-  Matter.World.add(this.engine.world, lvl.char);
-  this.currentChar = lvl.char;
+  if(lvl.char){
+    TweenLite.delayedCall(GLOBALS.char.gamestart.delay, function(){
+      Matter.World.add(_self.engine.world, lvl.char);
+      _self.currentChar = lvl.char;
+    });
+  }
 }
 
 Game.prototype.removeLevel = function(lvl){
@@ -480,6 +539,14 @@ Object.defineProperties(Game.prototype, {
     }
   },
   // private variables
+  images: {
+    set: function(val){
+      this._images = val;
+    },
+    get: function(){
+      return this._images;
+    }
+  },
   sounds: {
     set: function(val){
       this._sounds = val;
@@ -615,12 +682,36 @@ Object.defineProperties(Game.prototype, {
       return this._charIsUnderBrick;
     }
   },
+  charFacing: {
+    set: function(val){
+      this._charFacing = val;
+    },
+    get: function(){
+      return this._charFacing;
+    }
+  },
   charSpriteset: {
     set: function(val){
       this._charSpriteset = val;
     },
     get: function(){
       return this._charSpriteset;
+    }
+  },
+  sprites_r: {
+    set: function(val){
+      this._sprites_r = val;
+    },
+    get: function(){
+      return this._sprites_r;
+    }
+  },
+  sprites_l: {
+    set: function(val){
+      this._sprites_l = val;
+    },
+    get: function(){
+      return this._sprites_l;
     }
   },
   sm_sprites_r: {

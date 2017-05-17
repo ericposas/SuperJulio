@@ -12,7 +12,7 @@ function Brick(i, o, brick_count){
       sprite: {
         xScale:0.2,
         yScale:0.2,
-        texture: 'img/brick_200x200.png'
+        texture: Images.brick
       }
     }
   });
@@ -29,7 +29,7 @@ function FauxBrick(i, o, _count){
       sprite: {
         xScale:0.2,
         yScale:0.2,
-        texture: 'img/brick_200x200.png'
+        texture: Images.brick
       }
     }
   });
@@ -56,7 +56,7 @@ function Qblock(i, o, _count){
       sprite: {
         xScale:0.4,
         yScale:0.4,
-        texture: 'img/qblock_100x100.png'
+        texture: Images.qblock
       }
     }
   });
@@ -87,7 +87,7 @@ function MiniBrick(pos){
           sprite: {
             xScale:0.1,
             yScale:0.1,
-            texture: 'img/brick_200x200.png'
+            texture: Images.brick
           }
         }
     });
@@ -103,7 +103,7 @@ function Box(i, o, box_count){
       sprite: {
         xScale:0.2,
         yScale:0.2,
-        texture: 'img/box_200x200.jpg'
+        texture: 'img/items/box_200x200.jpg'
       }
     }
   });

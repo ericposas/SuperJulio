@@ -4,7 +4,14 @@
 
 var GLOBALS = {
   char: {
-    jumpForce: 0.05,
+    gamestart: {
+      delay: 0.25
+    },
+    jumpForce: {
+      current: 0.05,
+      small: 0.05,
+      big: 0.06
+    },
     spriteswap: {
       //frames_per_state: 2,
       total_frames: 6

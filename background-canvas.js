@@ -7,11 +7,11 @@ lib.properties = {
 	width: 480,
 	height: 760,
 	fps: 60,
-	color: "#699CF9",
+	color: "#FFFFFF",
 	opacity: 1.00,
 	manifest: [
-		{src:"images/_4584.png?1495031684146", id:"_4584"},
-		{src:"images/clouds.png?1495031684146", id:"clouds"}
+		{src:"images/_4584.png?1495037548407", id:"_4584"},
+		{src:"images/clouds.png?1495037548408", id:"clouds"}
 	]
 };
 

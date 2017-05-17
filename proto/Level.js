@@ -13,6 +13,7 @@ function Level(level){
     bricks:this.bricks,
     fricks:this.fricks,
     coins:this.coins,
+    shrooms:this.shrooms,
     char:this.character,
     rows:this.rows
   };
@@ -24,6 +25,7 @@ Level.prototype.layout = function(rows){
   var qblock_count = 0;
   var frick_count = 0;
   var coin_count = 0;
+  var shroom_count = 0;
   // build level layout based on grid passed in 
   for(var i = 0; i < rows.length; i++){ 
     for(var o = 0; o < rows[i].length; o++){
@@ -50,6 +52,12 @@ Level.prototype.layout = function(rows){
         var coin = new Coin(i,o,coin_count);
         this.coins.push(coin);
         blocks.push(coin);
+      }
+      if(rows[i][o] == 'm'){
+        shroom_count+=1;
+        var shroom = new Mushroom(i,o,shroom_count);
+        this.shrooms.push(shroom);
+        blocks.push(shroom);
       }
       if(rows[i][o] == 'c'){
         this.character = new Character(i,o);
@@ -84,6 +92,14 @@ Object.defineProperties(Level.prototype, {
         this._coins = [];
       }
       return this._coins;
+    }
+  },
+  shrooms: {
+    get: function(){
+      if(!this._shrooms){
+        this._shrooms = [];
+      }
+      return this._shrooms;
     }
   },
   qblocks: {

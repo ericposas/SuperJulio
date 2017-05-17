@@ -25,7 +25,7 @@ window.onload = function(){
   game.w = 480;
   game.h = 800;
   game.name = "Super Julio";
-  
+  //game.addCharacter();
   
 }
 
