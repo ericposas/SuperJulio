@@ -308,11 +308,13 @@ Game.prototype.brickBreak = function(brick){
 *********/
 
 Game.prototype.shroomGet = function(shroom){
-  this.removeBody(shroom);
-  this.currentChar.size = CHAR_BIG;
-  this.sounds.play('powerup');
-  this.characterGrow();
-  console.log(this.currentChar.size); //code is repeating state character size/state change for some reason 
+  if(this.currentChar.position.y < shroom.position.y + 4){ 
+    this.removeBody(shroom);
+    this.currentChar.size = CHAR_BIG;
+    this.sounds.play('powerup');
+    this.characterGrow();
+    //console.log(this.currentChar.size); 
+  }
 }
 
 Game.prototype.coinGet = function(coin){
@@ -374,6 +376,7 @@ Game.prototype.move = function (direction){
 
 // Move character 
 Game.prototype.movechar = function(direction){
+  //console.log(GLOBALS.char.accel.speed);
   this.currentChar.charFacing = direction;
   this.increaseSpeed();
   if(this.currentChar.spritei < GLOBALS.char.spriteswap.total_frames){
