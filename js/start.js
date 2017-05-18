@@ -10,6 +10,7 @@ window.onload = function(){
   window.game = new Game();
   window.keys = new Keys();
   var lvl1 = new Level(Levels.level1);
+  var lvl2 = new Level(Levels.level2);
   
   game.addLevel(lvl1);
   game.start();
@@ -17,6 +18,8 @@ window.onload = function(){
   game.h = 800;
   game.name = "Super Julio";
   
+  // Testing level-swap... 
+  game.swapLevel(lvl2);
   
 }
 

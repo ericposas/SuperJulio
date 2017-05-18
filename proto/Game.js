@@ -513,7 +513,22 @@ Game.prototype.addLevel = function(lvl){
 }
 
 Game.prototype.removeLevel = function(lvl){
-  Matter.World.remove(this.engine.world, lvl);
+  for(var i = 0; i < lvl.layout.length; i++){
+    Matter.World.remove(this.engine.world, lvl.layout[i]);
+  }
+}
+
+Game.prototype.swapLevel = function(newlvl){
+  //this.removeLevel(this.currentLevel);
+  //this.addLevel(newlvl);
+  TweenLite.delayedCall(1.5, function(){
+    game.removeLevel(game.currentLevel);
+    console.log('Removing ' + game.currentLevel.name+'...');
+  });
+  TweenLite.delayedCall(GLOBALS.level.swapdelay, function(){
+    game.addLevel(newlvl);
+    console.log('Now adding '+newlvl.name+'...');
+  });
 }
 
 

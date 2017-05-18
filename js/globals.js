@@ -27,6 +27,9 @@ var GLOBALS = {
       right: 340
     }
   },
+  level: {
+    swapdelay: 3
+  },
   stage: {
     adjust: 14,
     charlimit: {
