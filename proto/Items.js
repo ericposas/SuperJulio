@@ -16,6 +16,7 @@ function Shroom(pos, _count){
           }
         }
     });
+  //this.position = { x:pos.x, y:pos.y };
   return shroom;
 }
 

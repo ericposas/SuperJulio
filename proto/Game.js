@@ -335,9 +335,13 @@ Game.prototype.blockCoinPop = function(pos){
 Game.prototype.shroomPopOut = function(block){
   var _self = this;
   if(block){
-    TweenLite.delayedCall(0, function(){
-      Matter.Body.translate(block.shroom, {x:0, y:40});
-    });
+    //game.addBody(block.shroom);
+    Matter.World.add(this.engine.world, block.shroom);
+    //console.log(block.shroom.position);
+    //console.log(this.shroom_ids[0].position);
+    /*TweenLite.delayedCall(0, function(){
+      Matter.Body.translate(block.shroom, {x:0, y:300});
+    });*/
   }
 }
 
@@ -504,8 +508,16 @@ Game.prototype.removeBody = function(body){
 //to the new level in order to access that level's objects (boxes/bricks)
 //-- Level layout is a multi-dimensional array 
 Game.prototype.addLevel = function(lvl){
-  var _self = this;
-  Matter.World.add(this.engine.world, lvl.layout);
+  if(this.shroom_ids){
+    this.shroom_ids = [];
+  }
+  //Matter.World.add(this.engine.world, lvl.layout);
+  for(var i = 0; i < lvl.layout.length; i++){
+    var m = /(^shroom)\-(\d{1,})/g.exec(lvl.layout[i].id);
+    if(!m){
+      Matter.World.add(this.engine.world, lvl.layout[i]);
+    }
+  }
   this.currentLevel = lvl;
   if(lvl.char){
     this.addCharacter(lvl.char);
@@ -669,7 +681,19 @@ Object.defineProperties(Game.prototype, {
     get: function(){
       return ['brick', 'frick', 'qblock', 'pblock', 'coin', 'mushroom', 'shroom'];
     }
-  }
+  },
+  // store mushroom IDs for later use.. 
+  /*shroom_ids: {
+    set: function(v){
+      this._shroom_ids = v;
+    },
+    get: function(){
+      if(!this._shroom_ids){
+        this._shroom_ids = [];
+      }
+      return this._shroom_ids;
+    }
+  }*/
 });
 
 

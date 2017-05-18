@@ -19,7 +19,7 @@ window.onload = function(){
   game.name = "Super Julio";
   
   // Testing level-swap... 
-  game.swapLevel(lvl2);
+  //game.swapLevel(lvl2);
   
 }
 

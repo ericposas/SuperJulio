@@ -56,7 +56,7 @@ Level.prototype.layout = function(rows){
         shroom_count+=1;
         var pblock = new Qblock(i,o,pblock_count,'p');
         this.pblocks.push(pblock);
-        var shroom = new Shroom({x:pblock.position.x,y:-100}, shroom_count); //place offscreen somewhere 
+        var shroom = new Shroom({x:pblock.position.x,y:pblock.position.y-20}, shroom_count); //place offscreen somewhere 
         this.shrooms.push(shroom);
         pblock.shroom = shroom;
         blocks.push(pblock);
