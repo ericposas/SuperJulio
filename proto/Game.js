@@ -159,15 +159,14 @@ Game.prototype.collisions = function(){
   var _self = this;
   Matter.Events.on(this.engine, 'collisionStart', function(evt){
     var str = evt.pairs[0].id; //get collision pairs 
-    // check for various block/brick collisions 
     if(_self.currentChar && (str.indexOf(_self.currentChar.id))){
-      _self.brickCheck(str);
-      _self.qblockCheck(str);
-      _self.pblockCheck(str);
-      _self.frickCheck(str);
-      _self.coinCheck(str);
+      //loop thru and check for collisions on on all brick types 
+      for(var i = 0; i < _self.brick_types.length; i++){
+        _self.brickTypeCheck(_self.brick_types[i], str);
+      }
       //_self.shroomCheck(str);
       _self.mushroomCheck(str);
+      _self.coinCheck(str);
     }
     if(_self.currentChar && KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
       _self.currentChar.render.sprite.texture = _self.charSpriteset[0];
@@ -236,61 +235,25 @@ Game.prototype.coinCheck = function(str){
   }
 }
 
-Game.prototype.qblockCheck = function(str){
+Game.prototype.brickTypeCheck = function(type, str){
   var _self = this;
-  if(str.indexOf('qblock')){
-    var id = _self.getBodyID('qblock', str);
-    if(id != null){
-      var qblock = _self.currentLevel.qblocks[id];
-      if(_self.checkCharIsUnderBrick(qblock)){ 
-        _self.qBlockHit(qblock);
-      }else{
-        _self.charStandingOn = 'qblock';
-      }
-    }
-  }
-}
-
-Game.prototype.pblockCheck = function(str){
-  var _self = this;
-  if(str.indexOf('pblock')){
-    var id = _self.getBodyID('pblock', str);
-    if(id != null){
-      var pblock = _self.currentLevel.pblocks[id];
-      if(_self.checkCharIsUnderBrick(pblock)){ 
-        _self.qBlockHit(pblock, 'p');
-      }else{
-        _self.charStandingOn = 'qblock';
-      }
-    }
-  }
-}
-
-Game.prototype.brickCheck = function(str){
-  var _self = this;
-  if(str.indexOf('brick')){
-    var id = _self.getBodyID('brick', str);
-    if(id != null){
-      var brick = _self.currentLevel.bricks[id];
-      if(_self.checkCharIsUnderBrick(brick)){ 
-        _self.currentChar.state == CHAR_BIG ? _self.brickBreak(brick) : _self.sounds.play('bump');
-      }else{
-        _self.charStandingOn = 'brick';
-      }
-    }
-  }
-}
-
-Game.prototype.frickCheck = function(str){
-  var _self = this;
-  if(str.indexOf('frick')){
-    var id = _self.getBodyID('frick', str);
-    if(id != null){
-      var frick = _self.currentLevel.fricks[id];
-      if(_self.checkCharIsUnderBrick(frick)){ 
-        _self.qBlockHit(frick);
-      }else{
-        _self.charStandingOn = 'frick';
+  if(str.indexOf(type)){
+    var id = _self.getBodyID(type, str);
+    var item = _self.currentLevel[type+'s'][id];
+    if(item && _self.checkCharIsUnderBrick(type, item)){
+      switch(type){
+        case 'brick':
+          _self.brickBreak(item);
+          break;
+        case 'frick':
+          _self.qBlockHit(item);
+          break;
+        case 'qblock':
+          _self.qBlockHit(item);
+          break;
+        case 'pblock':
+          _self.qBlockHit(item, 'p');
+          break;
       }
     }
   }
@@ -335,31 +298,36 @@ Game.prototype.qBlockHit = function(qb, option){
 }
 
 Game.prototype.brickBreak = function(brick){
-  this.sounds.play('brick');
-  var mini_bricks = [],
-      _self = this,
-      x_range = [-0.002, -0.001, 0, 0.001, 0.002],
-      y_range = [-0.005, -0.004, -0.003, -0.002, -0.001];
-  for(var i = 0; i < 4; i+=1){
-    mini_bricks[i] = new MiniBrick(this.currentChar.position);
-    var _x = x_range[getRandomInt(0,x_range.length-1)],
-        _y = y_range[getRandomInt(0,y_range.length-1)];
-    Matter.World.add(this.engine.world, mini_bricks[i]);
-    Matter.Body.applyForce(mini_bricks[i], mini_bricks[i].position, {x:_x,y:_y});
-    Matter.Body.rotate(mini_bricks[i], getRandomInt(1, 50));
-    TweenLite.delayedCall(1.5, function(){
-      Matter.World.remove(_self.engine.world, mini_bricks);
-    });
+  if(this.currentChar.state == CHAR_BIG){
+    this.sounds.play('brick');
+    var mini_bricks = [],
+        _self = this,
+        x_range = [-0.002, -0.001, 0, 0.001, 0.002],
+        y_range = [-0.005, -0.004, -0.003, -0.002, -0.001];
+    for(var i = 0; i < 4; i+=1){
+      mini_bricks[i] = new MiniBrick(this.currentChar.position);
+      var _x = x_range[getRandomInt(0,x_range.length-1)],
+          _y = y_range[getRandomInt(0,y_range.length-1)];
+      Matter.World.add(this.engine.world, mini_bricks[i]);
+      Matter.Body.applyForce(mini_bricks[i], mini_bricks[i].position, {x:_x,y:_y});
+      Matter.Body.rotate(mini_bricks[i], getRandomInt(1, 50));
+      TweenLite.delayedCall(1.5, function(){
+        Matter.World.remove(_self.engine.world, mini_bricks);
+      });
+    }
+    this.removeBody(brick);
+  }else{
+    this.sounds.play('bump');
   }
-  this.removeBody(brick);
 }
 
-Game.prototype.checkCharIsUnderBrick = function(brick){
+Game.prototype.checkCharIsUnderBrick = function(type, brick){
   if((this.currentChar.position.y > brick.position.y + 22) &&
      (this.currentChar.position.x > brick.position.x - 22) &&
      (this.currentChar.position.x < brick.position.x + 35)){
     return true;
   }else{
+    this.charStandingOn = type;
     return false;
   }
 }
@@ -766,6 +734,11 @@ Object.defineProperties(Game.prototype, {
     },
     get: function(){
       return this._bg;
+    }
+  },
+  brick_types: {
+    get: function(){
+      return ['brick', 'frick', 'qblock', 'pblock'];
     }
   }
 });
