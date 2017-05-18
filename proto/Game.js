@@ -175,24 +175,6 @@ Game.prototype.collisions = function(){
   });
 }
 
-Game.prototype.mushroomCheck = function(str){
-  var _self = this;
-  var id = _self.getMushroomID(str);
-  if(id != null){
-    var shroom = _self.currentLevel.mushrooms[id];
-    _self.shroomGet(shroom);
-  }
-}
-
-Game.prototype.shroomCheck = function(str){
-  var _self = this;
-  var id = _self.getShroomID(str);
-  if(id != null){
-    var shroom = _self.currentLevel.shrooms[id];
-    _self.shroomGet(shroom);
-  }
-}
-
 Game.prototype.shroomGet = function(shroom){
   this.currentChar.state = CHAR_BIG;
   this.sounds.play('powerup');
@@ -200,17 +182,6 @@ Game.prototype.shroomGet = function(shroom){
   this.characterGrow();
   console.log(this.currentChar.state);
 }
-
-Game.prototype.coinCheck = function(str){
-  var _self = this;
-  if(str.indexOf('coin')){
-    var id = _self.getCoinID(str);
-    if(id != null){
-      var coin = _self.currentLevel.coins[id];
-      _self.coinGet(coin);
-    }
-  }
-} 
 
 Game.prototype.coinGet = function(coin){
   this.sounds.play('coin');
@@ -232,16 +203,43 @@ Game.prototype.shroomPopOut = function(block){
   if(block){
     TweenLite.delayedCall(0, function(){
       Matter.Body.translate(block.shroom, {x:0, y:40});
-      //console.log(block.shroom.position);
     });
   }
-  //Matter.Body.applyForce(shroom, shroom.position, {x:0,y:-0.005});
+}
+
+Game.prototype.mushroomCheck = function(str){
+  var _self = this;
+  var id = _self.getBodyID('mushroom', str);
+  if(id != null){
+    var shroom = _self.currentLevel.mushrooms[id];
+    _self.shroomGet(shroom);
+  }
+}
+
+Game.prototype.shroomCheck = function(str){
+  var _self = this;
+  var id = _self.getBodyID('shroom', str);
+  if(id != null){
+    var shroom = _self.currentLevel.shrooms[id];
+    _self.shroomGet(shroom);
+  }
+}
+
+Game.prototype.coinCheck = function(str){
+  var _self = this;
+  if(str.indexOf('coin')){
+    var id = _self.getBodyID('coin', str);
+    if(id != null){
+      var coin = _self.currentLevel.coins[id];
+      _self.coinGet(coin);
+    }
+  }
 }
 
 Game.prototype.qblockCheck = function(str){
   var _self = this;
   if(str.indexOf('qblock')){
-    var id = _self.getQBlockID(str);
+    var id = _self.getBodyID('qblock', str);
     if(id != null){
       var qblock = _self.currentLevel.qblocks[id];
       if(_self.checkCharIsUnderBrick(qblock)){ 
@@ -256,7 +254,7 @@ Game.prototype.qblockCheck = function(str){
 Game.prototype.pblockCheck = function(str){
   var _self = this;
   if(str.indexOf('pblock')){
-    var id = _self.getPBlockID(str);
+    var id = _self.getBodyID('pblock', str);
     if(id != null){
       var pblock = _self.currentLevel.pblocks[id];
       if(_self.checkCharIsUnderBrick(pblock)){ 
@@ -271,11 +269,10 @@ Game.prototype.pblockCheck = function(str){
 Game.prototype.brickCheck = function(str){
   var _self = this;
   if(str.indexOf('brick')){
-    var id = _self.getBrickID(str);
+    var id = _self.getBodyID('brick', str);
     if(id != null){
       var brick = _self.currentLevel.bricks[id];
       if(_self.checkCharIsUnderBrick(brick)){ 
-        //c.comment('brick break!');
         _self.currentChar.state == CHAR_BIG ? _self.brickBreak(brick) : _self.sounds.play('bump');
       }else{
         _self.charStandingOn = 'brick';
@@ -287,11 +284,10 @@ Game.prototype.brickCheck = function(str){
 Game.prototype.frickCheck = function(str){
   var _self = this;
   if(str.indexOf('frick')){
-    var id = _self.getFrickID(str);
+    var id = _self.getBodyID('frick', str);
     if(id != null){
       var frick = _self.currentLevel.fricks[id];
       if(_self.checkCharIsUnderBrick(frick)){ 
-        //c.comment('Fake brick hit!');
         _self.qBlockHit(frick);
       }else{
         _self.charStandingOn = 'frick';
@@ -368,50 +364,9 @@ Game.prototype.checkCharIsUnderBrick = function(brick){
   }
 }
 
-Game.prototype.getShroomID = function(str){
-  var match = /shroom\-(\d{1,})/g.exec(str);
-  if(match && match[1]){
-    return (parseInt(match[1]) - 1);
-  }
-}
-
-Game.prototype.getMushroomID = function(str){
-  var match = /mushroom\-(\d{1,})/g.exec(str);
-  if(match && match[1]){
-    return (parseInt(match[1]) - 1);
-  }
-}
-
-Game.prototype.getCoinID = function(str){
-  var match = /coin\-(\d{1,})/g.exec(str);
-  if(match && match[1]){
-    return (parseInt(match[1]) - 1);
-  }
-}
-
-Game.prototype.getQBlockID = function(str){
-  var match = /qblock\-(\d{1,})/g.exec(str);
-  if(match && match[1]){
-    return (parseInt(match[1]) - 1);
-  }
-}
-
-Game.prototype.getPBlockID = function(str){
-  var match = /pblock\-(\d{1,})/g.exec(str);
-  if(match && match[1]){
-    return (parseInt(match[1]) - 1);
-  }
-}
-
-Game.prototype.getBrickID = function(str){
-  var match = /brick\-(\d{1,})/g.exec(str);
-  if(match && match[1]){
-    return (parseInt(match[1]) - 1);
-  }
-}
-
-Game.prototype.getFrickID = function(str){
-  var match = /frick\-(\d{1,})/g.exec(str);
+Game.prototype.getBodyID = function(type, str){
+  var rgx = new RegExp(type+"\\-(\\d{1,})", "g");
+  var match = rgx.exec(str);
   if(match && match[1]){
     return (parseInt(match[1]) - 1);
   }
@@ -445,9 +400,9 @@ Game.prototype.move = function (direction){
   }
   // scroll the bg image in the background canvas element 
   if(direction == 'right' && this.bg.x < -10){
-    this.bg.x++;
+    if(this.bg){ this.bg.x++; }
   }else{
-    this.bg.x--;
+    if(this.bg){ this.bg.x--; }
   }
 }
 
