@@ -135,7 +135,8 @@ Game.prototype.scroll = function (){
 }
 
 Game.prototype.isCharStandingOnAnything = function(){
-  if(this.charStandingOn != 'brick' && this.charStandingOn != 'qblock' && this.charStandingOn != 'frick'){
+  if(this.charStandingOn != 'brick' && this.charStandingOn != 'frick' &&
+     this.charStandingOn != 'qblock' && this.charStandingOn != 'pblock'){
     return false;
   }else{
     return true;
@@ -148,10 +149,6 @@ Game.prototype.isCharStandingOnAnything = function(){
 *************/
 
 var CollisionCategories = {
-  //brick : 0x0001,
-  //mini_brick : 0x0002,
-  //qblock : 0x0004,
-  //char : 0x0008
   masked : 0x0002
 }
 
@@ -159,110 +156,99 @@ Game.prototype.collisions = function(){
   var _self = this;
   Matter.Events.on(this.engine, 'collisionStart', function(evt){
     var str = evt.pairs[0].id; //get collision pairs 
-    if(_self.currentChar && (str.indexOf(_self.currentChar.id))){
-      //loop thru and check for collisions on on all brick types 
-      for(var i = 0; i < _self.brick_types.length; i++){
-        _self.brickTypeCheck(_self.brick_types[i], str);
-      }
-      //_self.shroomCheck(str);
-      _self.mushroomCheck(str);
-      _self.coinCheck(str);
-    }
+    _self.itemCollisionCheck(str); //get collision type (item, block, etc.)
+    
     if(_self.currentChar && KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
       _self.currentChar.render.sprite.texture = _self.charSpriteset[0];
     }
   });
 }
 
-Game.prototype.shroomGet = function(shroom){
-  this.currentChar.state = CHAR_BIG;
-  this.sounds.play('powerup');
-  this.removeBody(shroom);
-  this.characterGrow();
-  console.log(this.currentChar.state);
-}
-
-Game.prototype.coinGet = function(coin){
-  this.sounds.play('coin');
-  this.removeBody(coin);
-}
-
-Game.prototype.blockCoinPop = function(pos){
-  var coin = new BlockCoin(pos),
-      _self = this;
-  this.addBody(coin);
-  Matter.Body.applyForce(coin, coin.position, {x:0,y:-0.02});
-  TweenLite.delayedCall(1.25, function(){
-    _self.removeBody(coin);
-  });
-}
-
-Game.prototype.shroomPopOut = function(block){
-  var _self = this;
-  if(block){
-    TweenLite.delayedCall(0, function(){
-      Matter.Body.translate(block.shroom, {x:0, y:40});
-    });
-  }
-}
-
-Game.prototype.mushroomCheck = function(str){
-  var _self = this;
-  var id = _self.getBodyID('mushroom', str);
-  if(id != null){
-    var shroom = _self.currentLevel.mushrooms[id];
-    _self.shroomGet(shroom);
-  }
-}
-
-Game.prototype.shroomCheck = function(str){
-  var _self = this;
-  var id = _self.getBodyID('shroom', str);
-  if(id != null){
-    var shroom = _self.currentLevel.shrooms[id];
-    _self.shroomGet(shroom);
-  }
-}
-
-Game.prototype.coinCheck = function(str){
-  var _self = this;
-  if(str.indexOf('coin')){
-    var id = _self.getBodyID('coin', str);
-    if(id != null){
-      var coin = _self.currentLevel.coins[id];
-      _self.coinGet(coin);
+Game.prototype.itemCollisionCheck = function(str){
+  //loop thru and check for collisions on on all brick types 
+  if(this.currentChar && (str.indexOf(this.currentChar.id))){
+    for(var i = 0; i < this.item_types.length; i++){
+      this.itemTypeCheck(this.item_types[i], str);
     }
   }
 }
 
-Game.prototype.brickTypeCheck = function(type, str){
+Game.prototype.itemTypeCheck = function(type, str){
   var _self = this;
   if(str.indexOf(type)){
     var id = _self.getBodyID(type, str);
     var item = _self.currentLevel[type+'s'][id];
-    if(item && _self.checkCharIsUnderBrick(type, item)){
-      switch(type){
-        case 'brick':
-          _self.brickBreak(item);
-          break;
-        case 'frick':
-          _self.qBlockHit(item);
-          break;
-        case 'qblock':
-          _self.qBlockHit(item);
-          break;
-        case 'pblock':
-          _self.qBlockHit(item, 'p');
-          break;
-      }
+    //check for block types 
+    if(item && type.indexOf('ck') != -1){
+      this.hitBlock(type, item);
+    }else if(item){
+      this.getItem(type, item);
     }
+  }
+}
+
+Game.prototype.hitBlock = function(type, item){
+  // hit the brick/block if character is underneath it 
+  if(this.checkCharIsUnderBrick(type, item) == true){
+    switch(type){
+      case 'brick':
+        this.brickBreak(item);
+        break;
+      case 'frick':
+        this.qBlockHit(item);
+        break;
+      case 'qblock':
+        this.qBlockHit(item);
+        break;
+      case 'pblock':
+        this.qBlockHit(item, 'p');
+        break;
+    }
+  }
+}
+
+Game.prototype.getItem = function(type, item){
+  switch(type){
+    case 'coin':
+      this.coinGet(item);
+      break;
+    case 'mushroom':
+      this.shroomGet(item);
+      break;
+    case 'shroom':
+      this.shroomGet(item);
+      break;
+  }
+  
+}
+
+Game.prototype.getBodyID = function(type, str){
+  var rgx = new RegExp(type+"\\-(\\d{1,})", "g");
+  var match = rgx.exec(str);
+  if(match && match[1]){
+    return (parseInt(match[1]) - 1);
+  }
+}
+
+
+/************
+  BLOCK HIT
+************/
+
+Game.prototype.checkCharIsUnderBrick = function(type, brick){
+  if((this.currentChar.position.y > brick.position.y + 22) &&
+     (this.currentChar.position.x > brick.position.x - 22) &&
+     (this.currentChar.position.x < brick.position.x + 35)){
+    return true;
+  }else{
+    this.charStandingOn = type;
+    return false;
   }
 }
 
 Game.prototype.qBlockHit = function(qb, option){
   var frames = 10, rate = 0.0075;
   if(qb.state != 'hit'){
-    console.log(qb.id);
     if(option == 'p'){
       this.sounds.play('powerup_appears');
       this.shroomPopOut(qb);
@@ -298,7 +284,7 @@ Game.prototype.qBlockHit = function(qb, option){
 }
 
 Game.prototype.brickBreak = function(brick){
-  if(this.currentChar.state == CHAR_BIG){
+  if(this.currentChar.size == CHAR_BIG){
     this.sounds.play('brick');
     var mini_bricks = [],
         _self = this,
@@ -321,24 +307,43 @@ Game.prototype.brickBreak = function(brick){
   }
 }
 
-Game.prototype.checkCharIsUnderBrick = function(type, brick){
-  if((this.currentChar.position.y > brick.position.y + 22) &&
-     (this.currentChar.position.x > brick.position.x - 22) &&
-     (this.currentChar.position.x < brick.position.x + 35)){
-    return true;
-  }else{
-    this.charStandingOn = type;
-    return false;
+
+/********
+  ITEMS
+*********/
+
+Game.prototype.shroomGet = function(shroom){
+  this.removeBody(shroom);
+  this.currentChar.size = CHAR_BIG;
+  this.sounds.play('powerup');
+  this.characterGrow();
+  console.log(this.currentChar.size); //code is repeating state character size/state change for some reason 
+}
+
+Game.prototype.coinGet = function(coin){
+  this.sounds.play('coin');
+  this.removeBody(coin);
+}
+
+Game.prototype.blockCoinPop = function(pos){
+  var coin = new BlockCoin(pos),
+      _self = this;
+  this.addBody(coin);
+  Matter.Body.applyForce(coin, coin.position, {x:0,y:-0.02});
+  TweenLite.delayedCall(1.25, function(){
+    _self.removeBody(coin);
+  });
+}
+
+Game.prototype.shroomPopOut = function(block){
+  var _self = this;
+  if(block){
+    TweenLite.delayedCall(0, function(){
+      Matter.Body.translate(block.shroom, {x:0, y:40});
+    });
   }
 }
 
-Game.prototype.getBodyID = function(type, str){
-  var rgx = new RegExp(type+"\\-(\\d{1,})", "g");
-  var match = rgx.exec(str);
-  if(match && match[1]){
-    return (parseInt(match[1]) - 1);
-  }
-}
 
 /*************
     POWERS
@@ -351,8 +356,6 @@ Game.prototype.characterGrow = function(){
   this.currentChar.render.sprite.xScale = 0.5;
   this.currentChar.render.sprite.yScale = 0.5;
   GLOBALS.char.jumpForce.current = GLOBALS.char.jumpForce.big;
-  //Matter.Body.setInertia(this.currentChar, Infinity);
-  //Matter.Body.scale(this.currentChar, 1, 2.25);
 }
 
 
@@ -360,7 +363,7 @@ Game.prototype.characterGrow = function(){
    MOVEMENT
 *************/
 
-// Move stage bodies (bricks/boxes/etc.) ..testing bg image scroll 
+// Move stage bodies (bricks/boxes/etc.) 
 Game.prototype.move = function (direction){
   this.increaseSpeed();
   for(var i = 0; i < this.currentLevel.layout.length; i++){
@@ -391,8 +394,6 @@ Game.prototype.movechar = function(direction){
     this.char_x_translate = (direction == 'right' ? 0 : 0);
   }
   Matter.Body.translate(this.currentChar, {x:this.char_x_translate, y:-1});
-  //this.currentChar.angularVelocity = 0;
-  //Matter.Body.rotate(this.currentChar, 0);
 }
 Object.defineProperty(Game.prototype, 'char_x_translate', {
   set: function(val){
@@ -468,7 +469,7 @@ Game.prototype.jump = function(){
 }
 
 Game.prototype.playJumpSnd = function(){
-  if(this.currentChar.state == CHAR_BIG){
+  if(this.currentChar.size == CHAR_BIG){
     this.sounds.play('big_jump');
   }else{
     this.sounds.play('jump');
@@ -479,10 +480,6 @@ Game.prototype.playJumpSnd = function(){
 /*************
   ADD BODIES
 *************/
-
-/*Game.prototype.addCharacter = function(){
-  this.currentChar = new Character();
-}*/
 
 Game.prototype.addBody = function(body){
   Matter.World.add(this.engine.world, body);
@@ -736,9 +733,19 @@ Object.defineProperties(Game.prototype, {
       return this._bg;
     }
   },
-  brick_types: {
+  /*block_types: {
     get: function(){
       return ['brick', 'frick', 'qblock', 'pblock'];
+    }
+  },
+  item_types: {
+    get: function(){
+      return ['coin', 'mushroom', 'shroom'];
+    }
+  },*/
+  item_types: {
+    get: function(){
+      return ['brick', 'frick', 'qblock', 'pblock', 'coin', 'mushroom', 'shroom'];
     }
   }
 });

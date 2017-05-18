@@ -33,7 +33,7 @@ function Character(i, o){
 }
 
 Object.defineProperties(Character.prototype, {
-  state: {
+  size: {
     set: function(val){
       this._state = val;
     },
