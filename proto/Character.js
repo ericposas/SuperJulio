@@ -40,23 +40,63 @@ Object.defineProperties(Character.prototype, {
     get: function(){
       return this._state;
     }
+  },
+  charFacing: {
+    set: function(val){
+      this._charFacing = val;
+    },
+    get: function(){
+      return this._charFacing;
+    }
+  },
+  jumpState: {
+    set: function(val){
+      this._jumpState = val;
+    },
+    get: function(){
+      return this._jumpState;
+    }
+  },
+  standingOn: {
+    set: function(val){
+      this._standingOn = val;
+    },
+    get: function(){
+      return this._standingOn;
+    }
+  },
+  charSpriteset: {
+    set: function(val){
+      this._charSpriteset = val;
+    },
+    get: function(){
+      return this._charSpriteset;
+    }
+  },
+  sprites_r: {
+    set: function(val){
+      this._sprites_r = val;
+    },
+    get: function(){
+      return this._sprites_r;
+    }
+  },
+  sprites_l: {
+    set: function(val){
+      this._sprites_l = val;
+    },
+    get: function(){
+      return this._sprites_l;
+    }
+  },
+  // amount of frames per walkcycle 
+  spritei: {
+    set: function(val){
+      this._spritei = val;
+    },
+    get: function(){
+      return this._spritei;
+    }
   }
 });
 
-
-/*function Character(i, o){
-  var char = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 28, 38, {
-    id: 'character',
-    inertia: Infinity,
-    friction: 0,
-    render: {
-      fillStyle: '#FF0000',
-      sprite: {
-        xScale:0.9,
-        yScale:0.9 //,
-        //texture: 'img/mario01.png'
-      }
-    }
-  });
-  return char;
-}*/

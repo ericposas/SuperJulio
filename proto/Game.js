@@ -19,11 +19,6 @@ function Game(){
       height: 800
     }
   });
-  // initial sprite set 
-  this.sprites_r = this.sm_sprites_r;
-  this.sprites_l = this.sm_sprites_l;
-  this.charSpriteset = this.sprites_r;
-  if(!this.spritei){ this.spritei = 0; }
 }
 
 
@@ -106,11 +101,11 @@ Game.prototype.testBounds = function (){
 }
 
 Game.prototype.testJump = function(){
-  if(this.currentChar && this.currentChar.position.y < 738 && this.isCharStandingOnAnything() == false){
-    this.charJumpState = 'jumping';
-    this.currentChar.render.sprite.texture = this.charSpriteset[2];
-  }else{
-    this.charJumpState = 'grounded';
+  if(this.currentChar && this.currentChar.charSpriteset && this.currentChar.position.y < 738 && this.isCharStandingOnAnything() == false){
+    this.currentChar.jumpState = 'jumping';
+    this.currentChar.render.sprite.texture = this.currentChar.charSpriteset[2];
+  }else if(this.currentChar){
+    this.currentChar.jumpState = 'grounded';
   }
 }
 
@@ -135,8 +130,8 @@ Game.prototype.scroll = function (){
 }
 
 Game.prototype.isCharStandingOnAnything = function(){
-  if(this.charStandingOn != 'brick' && this.charStandingOn != 'frick' &&
-     this.charStandingOn != 'qblock' && this.charStandingOn != 'pblock'){
+  if(this.currentChar.standingOn != 'brick' && this.currentChar.standingOn != 'frick' &&
+     this.currentChar.standingOn != 'qblock' && this.currentChar.standingOn != 'pblock'){
     return false;
   }else{
     return true;
@@ -158,8 +153,8 @@ Game.prototype.collisions = function(){
     var str = evt.pairs[0].id; //get collision pairs 
     _self.itemCollisionCheck(str); //get collision type (item, block, etc.)
     
-    if(_self.currentChar && KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
-      _self.currentChar.render.sprite.texture = _self.charSpriteset[0];
+    if(_self.currentChar && _self.currentChar.charSpriteset && KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
+      _self.currentChar.render.sprite.texture = _self.currentChar.charSpriteset[0];
     }
   });
 }
@@ -241,7 +236,7 @@ Game.prototype.checkCharIsUnderBrick = function(type, brick){
      (this.currentChar.position.x < brick.position.x + 35)){
     return true;
   }else{
-    this.charStandingOn = type;
+    this.currentChar.standingOn = type;
     return false;
   }
 }
@@ -350,9 +345,9 @@ Game.prototype.shroomPopOut = function(block){
 *************/
 
 Game.prototype.characterGrow = function(){
-  this.sprites_l = this.big_sprites_l;
-  this.sprites_r = this.big_sprites_r;
-  this.charFacing == 'right' ? this.charSpriteset = this.sprites_r : this.charSpriteset = this.sprites_l;
+  this.currentChar.sprites_l = Sprites.big_sprites_l;
+  this.currentChar.sprites_r = Sprites.big_sprites_r;
+  this.currentChar.charFacing == 'right' ? this.currentChar.charSpriteset = this.currentChar.sprites_r : this.currentChar.charSpriteset = this.currentChar.sprites_l;
   this.currentChar.render.sprite.xScale = 0.5;
   this.currentChar.render.sprite.yScale = 0.5;
   GLOBALS.char.jumpForce.current = GLOBALS.char.jumpForce.big;
@@ -379,13 +374,12 @@ Game.prototype.move = function (direction){
 
 // Move character 
 Game.prototype.movechar = function(direction){
-  this.charFacing = direction;
-  //console.log(this.charFacing);
+  this.currentChar.charFacing = direction;
   this.increaseSpeed();
-  if(this.spritei < GLOBALS.char.spriteswap.total_frames){
-    this.spritei++;
+  if(this.currentChar.spritei < GLOBALS.char.spriteswap.total_frames){
+    this.currentChar.spritei++;
   }else{
-    this.spritei = 0;
+    this.currentChar.spritei = 0;
   }
   this.swapsprite(direction);
   if(this.leftBounds == true || this.rightBounds == true){
@@ -406,19 +400,20 @@ Object.defineProperty(Game.prototype, 'char_x_translate', {
 // Swap game character sprite 
 Game.prototype.swapsprite = function(direction){
   if(direction == 'right'){
-    this.charSpriteset = this.sprites_r;
+    this.currentChar.charSpriteset = this.currentChar.sprites_r;
   }else{
-    this.charSpriteset = this.sprites_l;
+    this.currentChar.charSpriteset = this.currentChar.sprites_l;
   }
   // currently switches between two sprites 
-  if(this.charJumpState == 'jumping' && this.currentChar.render.sprite.texture != this.charSpriteset[2]){
-    this.currentChar.render.sprite.texture = this.charSpriteset[2];
-  }else if(this.spritei > GLOBALS.char.spriteswap.total_frames/2 && this.charJumpState != 'jumping'){
-    this.currentChar.render.sprite.texture = this.charSpriteset[1];
-  }else if(this.spritei < GLOBALS.char.spriteswap.total_frames/2 && this.charJumpState != 'jumping'){
-    this.currentChar.render.sprite.texture = this.charSpriteset[0];
+  if(this.currentChar.jumpState == 'jumping' && this.currentChar.render.sprite.texture != this.currentChar.charSpriteset[2]){
+    this.currentChar.render.sprite.texture = this.currentChar.charSpriteset[2];
+  }else if((this.currentChar.spritei > GLOBALS.char.spriteswap.total_frames/2) &&
+           (this.currentChar.charSpriteset) && (this.currentChar.jumpState != 'jumping')){
+    this.currentChar.render.sprite.texture = this.currentChar.charSpriteset[1];
+  }else if((this.currentChar.spritei < GLOBALS.char.spriteswap.total_frames/2) &&
+           (this.currentChar.charSpriteset) && (this.currentChar.jumpState != 'jumping')){
+    this.currentChar.render.sprite.texture = this.currentChar.charSpriteset[0];
   }
-  
 }
 
 Game.prototype.increaseSpeed = function(){
@@ -461,10 +456,10 @@ Game.prototype.decel = function (direction){
 
 Game.prototype.jump = function(){
   // apply jump force to character 
-  if(this.currentChar && this.charJumpState != 'jumping'){
+  if(this.currentChar && this.currentChar.jumpState != 'jumping'){
     this.playJumpSnd();
     Matter.Body.applyForce(this.currentChar, this.currentChar.position, {x:0,y:(GLOBALS.char.jumpForce.current*-1)});
-    this.charStandingOn = 'nothing';
+    this.currentChar.standingOn = 'nothing';
   }
 }
 
@@ -481,6 +476,19 @@ Game.prototype.playJumpSnd = function(){
   ADD BODIES
 *************/
 
+Game.prototype.addCharacter = function(char){
+  var _self = this;
+  TweenLite.delayedCall(GLOBALS.char.gamestart.delay, function(){
+    Matter.World.add(_self.engine.world, char);
+    // initial sprite set 
+    _self.currentChar = char;
+    _self.currentChar.sprites_r = Sprites.sm_sprites_r;
+    _self.currentChar.sprites_l = Sprites.sm_sprites_l;
+    _self.currentChar.charSpriteset = _self.currentChar.sprites_r;
+    if(!_self.currentChar.spritei){ _self.currentChar.spritei = 0; }
+  });
+}
+
 Game.prototype.addBody = function(body){
   Matter.World.add(this.engine.world, body);
 }
@@ -489,16 +497,15 @@ Game.prototype.removeBody = function(body){
   Matter.World.remove(this.engine.world, body);
 }
 
-// Adds the specified level layout and sets the Game object's currentLevel to the new level in order to access that level's objects (boxes/bricks) -- Level layout is a multi-dimensional array 
+// Adds the specified level layout and sets the Game object's currentLevel
+//to the new level in order to access that level's objects (boxes/bricks)
+//-- Level layout is a multi-dimensional array 
 Game.prototype.addLevel = function(lvl){
   var _self = this;
   Matter.World.add(this.engine.world, lvl.layout);
   this.currentLevel = lvl;
   if(lvl.char){
-    TweenLite.delayedCall(GLOBALS.char.gamestart.delay, function(){
-      Matter.World.add(_self.engine.world, lvl.char);
-      _self.currentChar = lvl.char;
-    });
+    this.addCharacter(lvl.char);
   }
 }
 
@@ -521,14 +528,6 @@ Object.defineProperties(Game.prototype, {
     }
   },
   // private variables
-  images: {
-    set: function(val){
-      this._images = val;
-    },
-    get: function(){
-      return this._images;
-    }
-  },
   sounds: {
     set: function(val){
       this._sounds = val;
@@ -640,91 +639,6 @@ Object.defineProperties(Game.prototype, {
       return this._charRightBounds;
     }
   },
-  charJumpState: {
-    set: function(val){
-      this._charJumpState = val;
-    },
-    get: function(){
-      return this._charJumpState;
-    }
-  },
-  charStandingOn: {
-    set: function(val){
-      this._charStandingOn = val;
-    },
-    get: function(){
-      return this._charStandingOn;
-    }
-  },
-  charIsUnderBrick: {
-    set: function(val){
-      this._charIsUnderBrick = val;
-    },
-    get: function(){
-      return this._charIsUnderBrick;
-    }
-  },
-  charFacing: {
-    set: function(val){
-      this._charFacing = val;
-    },
-    get: function(){
-      return this._charFacing;
-    }
-  },
-  charSpriteset: {
-    set: function(val){
-      this._charSpriteset = val;
-    },
-    get: function(){
-      return this._charSpriteset;
-    }
-  },
-  sprites_r: {
-    set: function(val){
-      this._sprites_r = val;
-    },
-    get: function(){
-      return this._sprites_r;
-    }
-  },
-  sprites_l: {
-    set: function(val){
-      this._sprites_l = val;
-    },
-    get: function(){
-      return this._sprites_l;
-    }
-  },
-  sm_sprites_r: {
-    get: function(){
-      return [ 'img/small/mario01.png', 'img/small/mario02.png', 'img/small/jump.png' ];
-    }
-  },
-  sm_sprites_l: {
-    get: function(){
-      return [ 'img/small/mario01_l.png', 'img/small/mario02_l.png', 'img/small/jump_l.png' ];
-    }
-  },
-  big_sprites_r: {
-    get: function(){
-      return [ 'img/big/big_mario01.png', 'img/big/big_mario02.png', 'img/big/big_mario_jump.png' ];
-    }
-  },
-  big_sprites_l: {
-    get: function(){
-      return [ 'img/big/big_mario01_l.png', 'img/big/big_mario02_l.png', 'img/big/big_mario_jump_l.png' ];
-    }
-  },
-  // amount of frames per walkcycle 
-  spritei: {
-    set: function(val){
-      this._spritei = val;
-    },
-    get: function(){
-      return this._spritei;
-    }
-  },
   bg: {
     set: function(val){
       this._bg = val;
@@ -733,16 +647,6 @@ Object.defineProperties(Game.prototype, {
       return this._bg;
     }
   },
-  /*block_types: {
-    get: function(){
-      return ['brick', 'frick', 'qblock', 'pblock'];
-    }
-  },
-  item_types: {
-    get: function(){
-      return ['coin', 'mushroom', 'shroom'];
-    }
-  },*/
   item_types: {
     get: function(){
       return ['brick', 'frick', 'qblock', 'pblock', 'coin', 'mushroom', 'shroom'];
