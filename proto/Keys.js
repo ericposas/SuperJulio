@@ -22,10 +22,10 @@ var KEYSTATES = {
    KEYS
 **********/
 
-function Keys(game){
+function Keys(){
   this.construct();
   // pass game class instance in order to use the reference 
-  this.game = game;
+  this.game = window.game;
 }
 
 Keys.prototype.construct = function(){

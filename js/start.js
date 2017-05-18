@@ -12,11 +12,11 @@ window.onload = function(){
   page.setup_gamepage();
   
   // GAME SET UP
-  var lvl1 = new Level(Levels.level1);
   window.game = new Game();
-  var keys = new Keys(game);
+  window.keys = new Keys();
+  var lvl1 = new Level(Levels.level1);
+  
   game.addLevel(lvl1);
-  //var collisions = new Collisions(game);
   game.start();
   game.w = 480;
   game.h = 800;
