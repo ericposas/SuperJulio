@@ -319,6 +319,7 @@ Game.prototype.shroomGet = function(shroom){
   if(this.currentChar.position.y < shroom.position.y + 4){ 
     this.removeBody(shroom);
     this.currentChar.size = CHAR_BIG;
+    this.currentChar.power = MUSHROOM;
     this.sounds.play('powerup');
     this.characterGrow();
   }
@@ -327,9 +328,10 @@ Game.prototype.shroomGet = function(shroom){
 Game.prototype.flowerGet = function(flower){
   if(this.currentChar.position.y < flower.position.y + 4){ 
     this.removeBody(flower);
-    //this.currentChar.size = CHAR_BIG;
-    //this.sounds.play('powerup');
-    //this.characterGrow();
+    this.currentChar.size = CHAR_BIG;
+    this.currentChar.power = FIREFLOWER;
+    this.sounds.play('powerup');
+    this.characterFirePower();
   }
 }
 
@@ -368,9 +370,19 @@ Game.prototype.flowerPopOut = function(block){
 Game.prototype.characterGrow = function(){
   this.currentChar.sprites_l = Sprites.big_sprites_l;
   this.currentChar.sprites_r = Sprites.big_sprites_r;
+  this.getBig();
+}
+
+Game.prototype.characterFirePower = function(){
+  this.currentChar.sprites_l = Sprites.fire_sprites_l;
+  this.currentChar.sprites_r = Sprites.fire_sprites_r;
+  this.getBig();
+}
+
+Game.prototype.getBig = function(){
   this.currentChar.charFacing == 'right' ? this.currentChar.charSpriteset = this.currentChar.sprites_r : this.currentChar.charSpriteset = this.currentChar.sprites_l;
-  this.currentChar.render.sprite.xScale = 0.5;
-  this.currentChar.render.sprite.yScale = 0.5;
+  this.currentChar.render.sprite.xScale = 0.48;
+  this.currentChar.render.sprite.yScale = 0.48;
   GLOBALS.char.jumpForce.current = GLOBALS.char.jumpForce.big;
 }
 
@@ -504,6 +516,7 @@ Game.prototype.addCharacter = function(char){
     Matter.World.add(_self.engine.world, char);
     // initial sprite set 
     _self.currentChar = char;
+    _self.currentChar.power = NONE;
     _self.currentChar.sprites_r = Sprites.sm_sprites_r;
     _self.currentChar.sprites_l = Sprites.sm_sprites_l;
     _self.currentChar.charSpriteset = _self.currentChar.sprites_r;
@@ -547,7 +560,7 @@ Game.prototype.checkLevelBit = function(lvl, rgx){
     var m2 = RegExp("(\^"+rgx[1]+")\\-(\\d{1,})", "g").exec(lvl.layout[i].id);
     if(!m && !m2){
       Matter.World.add(this.engine.world, lvl.layout[i]);
-      console.log(lvl.layout[i].id);
+      //console.log(lvl.layout[i].id);
     }
   }
 }
@@ -559,8 +572,6 @@ Game.prototype.removeLevel = function(lvl){
 }
 
 Game.prototype.swapLevel = function(newlvl){
-  //this.removeLevel(this.currentLevel);
-  //this.addLevel(newlvl);
   TweenLite.delayedCall(1.5, function(){
     game.removeLevel(game.currentLevel);
     console.log('Removing ' + game.currentLevel.name+'...');

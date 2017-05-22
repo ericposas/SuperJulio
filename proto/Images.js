@@ -16,7 +16,9 @@ var Sprites = {
   sm_sprites_r: [ 'img/small/mario01.png', 'img/small/mario02.png', 'img/small/jump.png' ],
   sm_sprites_l: [ 'img/small/mario01_l.png', 'img/small/mario02_l.png', 'img/small/jump_l.png' ],
   big_sprites_r: [ 'img/big/big_mario01.png', 'img/big/big_mario02.png', 'img/big/big_mario_jump.png' ],
-  big_sprites_l: [ 'img/big/big_mario01_l.png', 'img/big/big_mario02_l.png', 'img/big/big_mario_jump_l.png' ]
+  big_sprites_l: [ 'img/big/big_mario01_l.png', 'img/big/big_mario02_l.png', 'img/big/big_mario_jump_l.png' ],
+  fire_sprites_r: [ 'img/fire/fire_mario01.png', 'img/fire/fire_mario02.png', 'img/fire/fire_mario_jump.png' ],
+  fire_sprites_l: [ 'img/fire/fire_mario01_l.png', 'img/fire/fire_mario02_l.png', 'img/fire/fire_mario_jump_l.png' ],
 }
 
 /*function Images(){

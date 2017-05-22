@@ -3,7 +3,10 @@
 *************/
 
 const CHAR_SMALL = "small",
-      CHAR_BIG = "big";
+      CHAR_BIG = "big",
+      MUSHROOM = "mushroom",
+      FIREFLOWER = "fireflower",
+      NONE = "none";
 
 function Character(i, o){
   var char, x, y;
@@ -40,6 +43,14 @@ Object.defineProperties(Character.prototype, {
     },
     get: function(){
       return this._state;
+    }
+  },
+  power: {
+    set: function(val){
+      this._power = val;
+    },
+    get: function(){
+      return this._power;
     }
   },
   charFacing: {
