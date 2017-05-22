@@ -19,7 +19,8 @@ function Character(i, o){
     inertia: Infinity,
     friction: 0,
     render: {
-      fillStyle: '#FF0000',
+      //fillStyle: 'rgba(0,0,0,1)',
+      //opacity: 0.5,
       sprite: {
         xScale:0.9,
         yScale:0.9,

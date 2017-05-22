@@ -10,9 +10,9 @@ lib.properties = {
 	color: "#FFFFFF",
 	opacity: 1.00,
 	manifest: [
-		{src:"images/_4584.png?1495118092869", id:"_4584"},
-		{src:"images/brick_200x200.jpg?1495118092869", id:"brick_200x200"},
-		{src:"images/clouds.png?1495118092869", id:"clouds"}
+		{src:"images/_4584.png?1495310499834", id:"_4584"},
+		{src:"images/brick_200x200.jpg?1495310499834", id:"brick_200x200"},
+		{src:"images/clouds.png?1495310499834", id:"clouds"}
 	]
 };
 

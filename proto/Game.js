@@ -37,6 +37,7 @@ Game.prototype.start = function(){
   // collisions  
   this.collisions();
   // setting canvas and context in case we want to draw over our scene 
+  // -maybe we'll use this for drawing the game's GUI elements (score, coin count, etc.) 
   this.canv = document.getElementsByTagName('canvas')[0];
   this.ctx = this.canv.getContext('2d');
 }
@@ -131,7 +132,8 @@ Game.prototype.scroll = function (){
 
 Game.prototype.isCharStandingOnAnything = function(){
   if(this.currentChar.standingOn != 'brick' && this.currentChar.standingOn != 'frick' &&
-     this.currentChar.standingOn != 'qblock' && this.currentChar.standingOn != 'pblock'){
+     this.currentChar.standingOn != 'qblock' && this.currentChar.standingOn != 'pblock' &&
+     this.currentChar.standingOn != 'fblock'){
     return false;
   }else{
     return true;
@@ -198,6 +200,9 @@ Game.prototype.hitBlock = function(type, item){
       case 'pblock':
         this.qBlockHit(item, 'p');
         break;
+      case 'fblock':
+        this.qBlockHit(item, 'f');
+        break;
     }
   }
 }
@@ -212,6 +217,9 @@ Game.prototype.getItem = function(type, item){
       break;
     case 'shroom':
       this.shroomGet(item);
+      break;
+    case 'flower':
+      this.flowerGet(item);
       break;
   }
   
@@ -244,9 +252,9 @@ Game.prototype.checkCharIsUnderBrick = function(type, brick){
 Game.prototype.qBlockHit = function(qb, option){
   var frames = 10, rate = 0.0075;
   if(qb.state != 'hit'){
-    if(option == 'p'){
+    if(option == 'p' || option == 'f'){
       this.sounds.play('powerup_appears');
-      this.shroomPopOut(qb);
+      option == 'f' ? console.log('fire flower appears!') : this.shroomPopOut(qb);
     }else{
       this.sounds.play('coin');
       this.blockCoinPop(qb.position);
@@ -313,7 +321,15 @@ Game.prototype.shroomGet = function(shroom){
     this.currentChar.size = CHAR_BIG;
     this.sounds.play('powerup');
     this.characterGrow();
-    //console.log(this.currentChar.size); 
+  }
+}
+
+Game.prototype.flowerGet = function(flower){
+  if(this.currentChar.position.y < flower.position.y + 4){ 
+    this.removeBody(flower);
+    //this.currentChar.size = CHAR_BIG;
+    //this.sounds.play('powerup');
+    //this.characterGrow();
   }
 }
 
@@ -333,15 +349,8 @@ Game.prototype.blockCoinPop = function(pos){
 }
 
 Game.prototype.shroomPopOut = function(block){
-  var _self = this;
   if(block){
-    //game.addBody(block.shroom);
     Matter.World.add(this.engine.world, block.shroom);
-    //console.log(block.shroom.position);
-    //console.log(this.shroom_ids[0].position);
-    /*TweenLite.delayedCall(0, function(){
-      Matter.Body.translate(block.shroom, {x:0, y:300});
-    });*/
   }
 }
 
@@ -512,15 +521,27 @@ Game.prototype.addLevel = function(lvl){
     this.shroom_ids = [];
   }
   //Matter.World.add(this.engine.world, lvl.layout);
-  for(var i = 0; i < lvl.layout.length; i++){
-    var m = /(^shroom)\-(\d{1,})/g.exec(lvl.layout[i].id);
-    if(!m){
-      Matter.World.add(this.engine.world, lvl.layout[i]);
-    }
-  }
+  this.buildLevel(lvl);
   this.currentLevel = lvl;
   if(lvl.char){
     this.addCharacter(lvl.char);
+  }
+}
+
+// powerups is a list of regex words to match/check for 
+Game.prototype.buildLevel = function(lvl){
+  var powerups = ["flower", "shroom"];
+  this.checkLevelBit(lvl, powerups[0]);
+  
+}
+
+Game.prototype.checkLevelBit = function(lvl, rgx){
+  for(var i = 0; i < lvl.layout.length; i++){
+    var m = RegExp("(\^"+rgx+")\\-(\\d{1,})", "g").exec(lvl.layout[i].id);
+    if(!m){
+      Matter.World.add(this.engine.world, lvl.layout[i]);
+      console.log(lvl.layout[i].id);
+    }
   }
 }
 
@@ -679,7 +700,7 @@ Object.defineProperties(Game.prototype, {
   },
   item_types: {
     get: function(){
-      return ['brick', 'frick', 'qblock', 'pblock', 'coin', 'mushroom', 'shroom'];
+      return ['brick', 'frick', 'qblock', 'pblock', 'fblock', 'coin', 'mushroom', 'shroom', 'flower'];
     }
   },
   // store mushroom IDs for later use.. 

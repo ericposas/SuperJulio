@@ -20,6 +20,23 @@ function Shroom(pos, _count){
   return shroom;
 }
 
+// FIRE FLOWER //
+function FireFlower(pos, _count){
+  var flower = Matter.Bodies.rectangle(pos.x, pos.y, 40, 40, {
+      id: 'flower-'+_count,
+      restitution: 0.5,
+      friction: 0,
+        render: {
+          sprite: {
+            xScale:0.2,
+            yScale:0.2,
+            texture: Images.fireflower
+          }
+        }
+    });
+  return flower;
+}
+
 // MUSHROOM //
 function Mushroom(i, o, _count){
   var mushroom = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 40, 40, {

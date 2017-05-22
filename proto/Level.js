@@ -11,11 +11,13 @@ function Level(level){
     layout:layout,
     qblocks:this.qblocks,
     pblocks:this.pblocks,
+    fblocks:this.fblocks,
     bricks:this.bricks,
     fricks:this.fricks,
     coins:this.coins,
     mushrooms:this.mushrooms,
     shrooms:this.shrooms,
+    flowers:this.flowers,
     char:this.character,
     rows:this.rows
   };
@@ -26,10 +28,12 @@ Level.prototype.layout = function(rows){
   var brick_count = 0;
   var qblock_count = 0;
   var pblock_count = 0;
+  var fblock_count = 0;
   var frick_count = 0;
   var coin_count = 0;
   var mushroom_count = 0;
   var shroom_count = 0;
+  var flower_count = 0;
   // build level layout based on grid passed in 
   for(var i = 0; i < rows.length; i++){ 
     for(var o = 0; o < rows[i].length; o++){
@@ -56,11 +60,23 @@ Level.prototype.layout = function(rows){
         shroom_count+=1;
         var pblock = new Qblock(i,o,pblock_count,'p');
         this.pblocks.push(pblock);
-        var shroom = new Shroom({x:pblock.position.x,y:pblock.position.y-20}, shroom_count); //place offscreen somewhere 
+        // shroom isn't added to world until the block is hit
+        var shroom = new Shroom({x:pblock.position.x,y:pblock.position.y-20}, shroom_count); 
         this.shrooms.push(shroom);
         pblock.shroom = shroom;
         blocks.push(pblock);
         blocks.push(shroom);
+      }
+      if(rows[i][o] == '?f'){
+        fblock_count+=1;
+        flower_count+=1;
+        var fblock = new Qblock(i,o,fblock_count,'f');
+        this.fblocks.push(fblock);
+        var flower = new FireFlower({x:fblock.position.x,y:fblock.position.y-20}, flower_count);
+        this.flowers.push(flower);
+        fblock.flower = flower;
+        blocks.push(fblock);
+        blocks.push(flower);
       }
       if(rows[i][o] == 'm'){
         mushroom_count+=1;
@@ -109,6 +125,14 @@ Object.defineProperties(Level.prototype, {
       return this._coins;
     }
   },
+  flowers: {
+    get: function(){
+      if(!this._flowers){
+        this._flowers = [];
+      }
+      return this._flowers;
+    }
+  },
   shrooms: {
     get: function(){
       if(!this._shrooms){
@@ -139,6 +163,14 @@ Object.defineProperties(Level.prototype, {
         this._pblocks = [];
       }
       return this._pblocks;
+    }
+  },
+  fblocks: {
+    get: function(){
+      if(!this._fblocks){
+        this._fblocks = [];
+      }
+      return this._fblocks;
     }
   },
   fricks: {

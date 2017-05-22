@@ -19,6 +19,8 @@ function Brick(i, o, brick_count){
   return brick;
 }
 
+
+
 // FAUX BRICK // 2
 function FauxBrick(i, o, _count){
   var frick = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 40, 40, {
@@ -46,12 +48,15 @@ Object.defineProperties(FauxBrick.prototype, {
   }
 });
 
+
+
 // QUESTION BLOCK // '?'
 function Qblock(i, o, _count, option){
   var x = (o*40)+20;
       y = (i*40)+20;
   var qblock = Matter.Bodies.rectangle(x, y, 40, 40, {
-    id: (option == 'p' ? 'pblock-' : 'qblock-') + _count,
+    //id: (option == 'p' ? 'pblock-' : 'qblock-') + _count,
+    id: this.getID(option) + _count,
     isStatic: true,
     friction: 0,
     render: {
@@ -64,6 +69,18 @@ function Qblock(i, o, _count, option){
   });
   this.position = {x:x, y:y};
   return qblock;
+}
+Qblock.prototype.getID = function(id){
+  switch(id){
+    case 'p':
+      return 'pblock-';
+      break;
+    case 'f':
+      return 'fblock-';
+      break;
+    default:
+      return 'qblock-';
+  }
 }
 Object.defineProperties(Qblock.prototype, {
   state: {
@@ -83,6 +100,7 @@ Object.defineProperties(Qblock.prototype, {
     }
   }
 });
+
 
 
 // MINI BRICK //

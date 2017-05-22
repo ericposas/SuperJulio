@@ -8,7 +8,8 @@ var Images = {
   brick : 'img/items/brick_200x200.png',
   qblock : 'img/items/qblock_100x100.png',
   empty_block: 'img/items/empty_block_100x100.png',
-  mushroom : 'img/items/mushroom_200x200.png'
+  mushroom : 'img/items/mushroom_200x200.png',
+  fireflower : 'img/items/flower_200x200.png'
 }
 
 var Sprites = {

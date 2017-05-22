@@ -55,7 +55,6 @@ function handleComplete(evt) {
 			stage.scaleY = pRatio*sRatio;			
 			lastW = iw; lastH = ih; lastS = sRatio;		
 		}
-	})(true,'width',false,2);
+	})(true,'width',false,2);	
   bg_objects();
 }
-
