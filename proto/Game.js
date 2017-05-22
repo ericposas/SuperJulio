@@ -254,7 +254,7 @@ Game.prototype.qBlockHit = function(qb, option){
   if(qb.state != 'hit'){
     if(option == 'p' || option == 'f'){
       this.sounds.play('powerup_appears');
-      option == 'f' ? console.log('fire flower appears!') : this.shroomPopOut(qb);
+      option == 'f' ? this.flowerPopOut(qb) : this.shroomPopOut(qb);
     }else{
       this.sounds.play('coin');
       this.blockCoinPop(qb.position);
@@ -351,6 +351,12 @@ Game.prototype.blockCoinPop = function(pos){
 Game.prototype.shroomPopOut = function(block){
   if(block){
     Matter.World.add(this.engine.world, block.shroom);
+  }
+}
+
+Game.prototype.flowerPopOut = function(block){
+  if(block){
+    Matter.World.add(this.engine.world, block.flower);
   }
 }
 
@@ -531,14 +537,15 @@ Game.prototype.addLevel = function(lvl){
 // powerups is a list of regex words to match/check for 
 Game.prototype.buildLevel = function(lvl){
   var powerups = ["flower", "shroom"];
-  this.checkLevelBit(lvl, powerups[0]);
+  this.checkLevelBit(lvl, powerups);
   
 }
 
 Game.prototype.checkLevelBit = function(lvl, rgx){
   for(var i = 0; i < lvl.layout.length; i++){
-    var m = RegExp("(\^"+rgx+")\\-(\\d{1,})", "g").exec(lvl.layout[i].id);
-    if(!m){
+    var m = RegExp("(\^"+rgx[0]+")\\-(\\d{1,})", "g").exec(lvl.layout[i].id);
+    var m2 = RegExp("(\^"+rgx[1]+")\\-(\\d{1,})", "g").exec(lvl.layout[i].id);
+    if(!m && !m2){
       Matter.World.add(this.engine.world, lvl.layout[i]);
       console.log(lvl.layout[i].id);
     }
