@@ -316,12 +316,14 @@ Game.prototype.brickBreak = function(brick){
 *********/
 
 Game.prototype.shroomGet = function(shroom){
-  if(this.currentChar.position.y < shroom.position.y + 4){ 
+  if(this.currentChar.position.y < shroom.position.y + 4){
     this.removeBody(shroom);
     this.currentChar.size = CHAR_BIG;
-    this.currentChar.power = MUSHROOM;
     this.sounds.play('powerup');
-    this.characterGrow();
+    if(this.currentChar.power != FIREFLOWER){
+      this.currentChar.power = MUSHROOM;
+      this.characterGrow();
+    }
   }
 }
 
@@ -384,6 +386,39 @@ Game.prototype.getBig = function(){
   this.currentChar.render.sprite.xScale = 0.48;
   this.currentChar.render.sprite.yScale = 0.48;
   GLOBALS.char.jumpForce.current = GLOBALS.char.jumpForce.big;
+}
+
+Game.prototype.char_throwFireBall = function(){
+  var _self = this;
+  if(!this.currentChar.active_fballs){ this.currentChar.active_fballs = 0; }
+  if(this.currentChar.power == FIREFLOWER && this.currentChar.active_fballs < 2){
+    this.sounds.play('fireball');
+    var fball = Matter.Bodies.circle(
+        (this.currentChar.charFacing == 'right' ? this.currentChar.position.x + 10 : this.currentChar.position.x - 10),
+        this.currentChar.position.y - 20, 10, {
+      fillStyle: "#FF0000",
+      restitution: 1,
+      render: {
+        sprite: {
+          xScale: 0.15,
+          yScale: 0.15,
+          texture: Images.fireball
+        }
+      }
+    });
+    this.currentChar.active_fballs+=1;
+    this.addBody(fball);
+    Matter.Body.applyForce(fball, fball.position, {
+      x:this.currentChar.charFacing == 'right' ? (0.0075) : (0.0075 * -1),
+      y:-0.005
+    });
+    Matter.Body.setAngularVelocity(fball, 0.2);
+    TweenLite.delayedCall(1, function(){
+      game.removeBody(fball);
+      game.currentChar.active_fballs-=1;
+    });
+  }
+  
 }
 
 

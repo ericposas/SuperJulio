@@ -109,6 +109,15 @@ Object.defineProperties(Character.prototype, {
     get: function(){
       return this._spritei;
     }
+  },
+  active_fballs: {
+    set: function(val){
+      this._active_fballs = val;
+    },
+    get: function(){
+      return this._active_fballs;
+    }
   }
 });
+
 

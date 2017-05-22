@@ -30,6 +30,9 @@ function Sounds(){
     src: ['sfx/smb_powerup_appears.wav'],
     volume: 0.75
   });
+  this.fireball = new Howl({
+    src: ['sfx/smb_fireball.wav']
+  });
   
 }
 
@@ -56,10 +59,21 @@ Sounds.prototype.play = function(sndName){
     case 'powerup_appears':
       this.powerup_appears.play();
       break;
+    case 'fireball':
+      this.fireball.play();
+      break;
   }
 }
 
 Object.defineProperties(Sounds.prototype, {
+  fireball: {
+    set: function(val){
+      this._fireball = val;
+    },
+    get: function(){
+      return this._fireball;
+    }
+  },
   brick_break: {
     set: function(val){
       this._brick_break = val;

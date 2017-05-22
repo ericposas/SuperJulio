@@ -31,7 +31,21 @@ function Keys(){
 Keys.prototype.construct = function(){
   document.body.addEventListener('keydown', this.keysdown.bind(this));
   document.body.addEventListener('keyup', this.keysup.bind(this));
+  document.body.addEventListener('keypress', this.spbarpress.bind(this));
 }
+
+
+/*************
+   SPACEBAR
+*************/
+
+Keys.prototype.spbarpress = function(evt){
+  evt.preventDefault();
+  if(evt.keyCode == KEYCODES.spacebar){
+    this.game.char_throwFireBall();
+  }
+}
+
 
 
 /*************
