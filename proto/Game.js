@@ -389,9 +389,13 @@ Game.prototype.getBig = function(){
 }
 
 Game.prototype.char_throwFireBall = function(){
-  var _self = this;
+  var _self = this,
+      fball_props = {
+        removal_delay : 0.75,
+        num_limit : 2
+      };
   if(!this.currentChar.active_fballs){ this.currentChar.active_fballs = 0; }
-  if(this.currentChar.power == FIREFLOWER && this.currentChar.active_fballs < 2){
+  if(this.currentChar.power == FIREFLOWER && this.currentChar.active_fballs < fball_props.num_limit){
     this.sounds.play('fireball');
     var fball = Matter.Bodies.circle(
         (this.currentChar.charFacing == 'right' ? this.currentChar.position.x + 10 : this.currentChar.position.x - 10),
@@ -413,11 +417,11 @@ Game.prototype.char_throwFireBall = function(){
       y:-0.005
     });
     Matter.Body.setAngularVelocity(fball, 0.2);
-    TweenLite.delayedCall(1, function(){
+    TweenLite.delayedCall(fball_props.removal_delay, function(){
       game.removeBody(fball);
       game.currentChar.active_fballs-=1;
     });
-  }
+  } 
   
 }
 
@@ -755,20 +759,7 @@ Object.defineProperties(Game.prototype, {
     get: function(){
       return ['brick', 'frick', 'qblock', 'pblock', 'fblock', 'coin', 'mushroom', 'shroom', 'flower'];
     }
-  },
-  // store mushroom IDs for later use.. 
-  /*shroom_ids: {
-    set: function(v){
-      this._shroom_ids = v;
-    },
-    get: function(){
-      if(!this._shroom_ids){
-        this._shroom_ids = [];
-      }
-      return this._shroom_ids;
-    }
-  }*/
+  }
 });
-
 
 

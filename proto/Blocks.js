@@ -90,14 +90,6 @@ Object.defineProperties(Qblock.prototype, {
     get: function(){
       return this._state;
     }
-  },
-  shroom: {
-    set: function(val){
-      this._shroom;
-    },
-    get: function(){
-      return this._shroom;
-    }
   }
 });
 
@@ -106,7 +98,6 @@ Object.defineProperties(Qblock.prototype, {
 // MINI BRICK //
 function MiniBrick(pos){
   var mini_brick = Matter.Bodies.rectangle(pos.x, pos.y-10, 10, 10, {
-      //id: 'mini',
       collisionFilter: {
         mask: CollisionCategories.masked 
       },
