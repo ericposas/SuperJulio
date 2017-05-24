@@ -212,13 +212,10 @@ Object.defineProperties(Level.prototype, {
     }
   },
   character: {
-    set: function(val){
-      this._character = val;
+    set: function(v){
+      this._character = v;
     },
     get: function(){
-      if(!this._character){
-        //c.comment('No character has been set.');
-      }
       return this._character;
     }
   },

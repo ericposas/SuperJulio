@@ -38,7 +38,7 @@ Goomba.prototype.alternateFeet = function(){
   var _self = this;
   if(this.state != 'dead'){
     TweenLite.delayedCall(this.feetRate, function(){
-      console.log(_self.state);
+      //console.log(_self.state);
       _self.texture = (_self.texture == Enemy_Sprites.goomba[0] ? Enemy_Sprites.goomba[1] : Enemy_Sprites.goomba[0]);
       _self.alternateFeet();
     });

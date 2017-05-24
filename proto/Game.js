@@ -162,8 +162,10 @@ Game.prototype.collisions = function(){
   var _self = this;
   Matter.Events.on(this.engine, 'collisionStart', function(evt){
     var str = evt.pairs[0].id; //get collision pairs 
-    _self.itemCollisionCheck(str); //get collision type (item, block, etc.)
-    _self.enemyCollisions(str);
+    //get collision type (item, block, etc.)
+    if(_self.itemCollisionCheck(str) != false){
+      _self.enemyCollisions(str);
+    }
     if(_self.currentChar && _self.currentChar.charSpriteset && KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
       _self.currentChar.render.sprite.texture = _self.currentChar.charSpriteset[0];
     }
@@ -172,51 +174,54 @@ Game.prototype.collisions = function(){
 
 Game.prototype.enemyCollisions = function(str){
   //GOOMBAS
-  //check collision with a wall 
+  //check for goomba collision 
   if(str.indexOf('goomba')){
-    //var goom_id = this.getBodyID('goomba',str);
-    //get the body IDs somehow 
+    // get the body types and ids, and store them in 'body_props' object 
     var rgx = /A(\w+)\-(\d+)B(\w+)\-(\d+)/g;
     var m = rgx.exec(str);
     if(m && m[1] && m[2] && m[3] && m[4]){
-      body_props = { body1:m[1], body2:m[3], id1:(parseInt(m[2])-1), id2:(parseInt(m[4])-1) };
+      body_props = {
+        body1: m[1],
+        body2: m[3],
+        id1: m[2],
+        id2: m[4]
+      };
       //console.log(body_props);
     }
-    
-    //var brick_id = this.getBodyID('brick', str);
-    //console.log(this.currentLevel.goombas[id]);
-    
+    // if we have both bodies, test for goombas 
     if(body_props.body1 != null && body_props.body2 != null){
-      var body1 = (body_props.body1 == 'goomba' ? this.currentLevel.goombas[body_props.id1] : this.currentLevel.bricks[body_props.id1]);
-      var body2 = (body_props.body2 == 'goomba' ? this.currentLevel.goombas[body_props.id2] : this.currentLevel.bricks[body_props.id2]);
+      var _self = this;
+      //var body1 = this.currentLevel[body_props.body1+'s'][(parseInt(body_props.id1)-1)];
+      var body1 = (function(){
+        if(body_props.body1 == 'character'){
+          return _self.currentChar;
+        }else{
+          return _self.currentLevel[body_props.body1+'s'][(parseInt(body_props.id1)-1)];
+        }
+      })();
+      var body2 = (function(){
+        if(body_props.body2 == 'character'){
+          return _self.currentChar;
+        }else{
+          return _self.currentLevel[body_props.body2+'s'][(parseInt(body_props.id2)-1)];
+        }
+      })();
       
-      //var brick = this.currentLevel.bricks[brick_id];
-      if(body1 != null && body2 != null && (body1.position.y < (body2.position.y + 4))){
-        if(body_props.body1 == 'goomba'){
+      if(body1 != null && body2 != null){
+        if(body_props.body1 == 'goomba' && (body2.position.y < (body1.position.y + 4))){
           body1.props.facing = (body1.props.facing == 'left' ? 'right' : 'left');
         }
-        if(body_props.body2 == 'goomba'){
+        if(body_props.body2 == 'goomba' && (body1.position.y < (body2.position.y + 4))){
           body2.props.facing = (body2.props.facing == 'left' ? 'right' : 'left');
+        }
+        if((body_props.body1 == 'character' && body_props.body2 == 'goomba') ||
+           (body_props.body1 == 'goomba' && body_props.body2 == 'character')){
+          //Now, I need to see if the character simply ran into a goomba, or if Julio stomped on a goomba 
+          console.log('goomba!');
         }
       }
     }
-    
-    /*if(goom_id != null && brick_id != null){
-      var goomba = this.currentLevel.goombas[goom_id];
-      var brick = this.currentLevel.bricks[brick_id];
-      //console.log(goom_id+', '+brick_id);
-      if(brick.position.y < goomba.position.y + 4){
-        goomba.props.facing = (goomba.props.facing == 'left' ? 'right' : 'left');
-      }
-    }*/
   }
-  //check a collision with another goomba (enemy) 
-  /*if(str.indexOf('goomba')){
-    var m = /Agoomba\-(\d+)Agoomba\-(\d+)/g.exec(str);
-    if(m && m[1] && m[2]){
-      console.log(m);
-    }
-  }*/
   
 }
 
@@ -262,6 +267,8 @@ Game.prototype.hitBlock = function(type, item){
       case 'fblock':
         this.qBlockHit(item, 'f');
         break;
+      default:
+        return false;
     }
   }
 }
@@ -280,9 +287,14 @@ Game.prototype.getItem = function(type, item){
     case 'flower':
       this.flowerGet(item);
       break;
+    default:
+      return false;
   }
-  
 }
+
+/*Game.prototype.testForEnemy = function(enemy){
+  console.log(arguments[1]);
+}*/
 
 Game.prototype.getBodyID = function(type, str){
   var rgx = new RegExp(type+"\\-(\\d{1,})", "g");
@@ -591,8 +603,6 @@ Game.prototype.jump = function(){
   if(this.currentChar && this.currentChar.jumpState != 'jumping'){
     this.playJumpSnd();
     Matter.Body.applyForce(this.currentChar, this.currentChar.position, {x:0,y:(GLOBALS.char.jumpForce.current*-1)});
-    console.log(this.currentChar.jumpState = 'jumping');
-    console.log(this.currentChar.jumpState);
     this.currentChar.standingOn = 'nothing';
   }
 }
@@ -818,7 +828,7 @@ Object.defineProperties(Game.prototype, {
   },
   item_types: {
     get: function(){
-      return ['brick', 'frick', 'qblock', 'pblock', 'fblock', 'coin', 'mushroom', 'shroom', 'flower'];
+      return ['brick', 'frick', 'qblock', 'pblock', 'fblock', 'coin', 'mushroom', 'shroom', 'flower', 'goomba'];
     }
   }
 });

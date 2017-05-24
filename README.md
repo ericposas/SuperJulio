@@ -3,6 +3,7 @@
   Mario-clone project, using Matter.js.. There will be violence 
   
   ### Known issues: 
+    - Brick-breaking seems off (not-consistent) since adding the enemy collision checks 
     - When I added in the Goomba collision check/animation, it screwed up Julio's jumping 
     - Julio stops walking motion, if he reaches the scrolling boundary, but not touching a wall (will be solved when I switch to the background canvas rendering) 
   

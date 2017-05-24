@@ -18,7 +18,7 @@ function Character(i, o){
     y = 100;
   }
   char = Matter.Bodies.rectangle(x, y, 28, 38, {
-    id: 'character',
+    id: 'character-1',
     inertia: Infinity,
     friction: 0,
     render: {
