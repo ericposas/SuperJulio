@@ -22,6 +22,10 @@ var Sprites = {
   fire_sprites_l: [ 'img/fire/fire_mario01_l.png', 'img/fire/fire_mario02_l.png', 'img/fire/fire_mario_jump_l.png' ],
 }
 
+var Enemy_Sprites = {
+  goomba : ['img/enemies/goomba_160x160.png', 'img/enemies/goomba_160x160_l.png']
+}
+
 /*function Images(){
   this.coin = 'img/items/coin.png';
   

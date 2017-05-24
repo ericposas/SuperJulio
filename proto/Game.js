@@ -55,11 +55,20 @@ Game.prototype.gameLoop = function(){
   this.testJump();
   this.testBounds();
   this.scroll();
+  this.animateEnemies();
   //this.renderCanvas();
   Matter.Engine.update(this.engine, 1000/60, 1);
   window.requestAnimationFrame(function(){
     _self.gameLoop();
   });
+}
+
+// Include enemies to game loop 
+Game.prototype.animateEnemies = function(){
+  for(var i = 0, goombas = this.currentLevel.goombas; i < goombas.length; i+=1){
+    Matter.Body.translate(goombas[i], {x:(goombas[i].props.facing == 'left' ? -1 : 1),y:-1});
+  }
+  
 }
 
 // Render canvas elements (outside of matter.js bodies)
@@ -154,11 +163,61 @@ Game.prototype.collisions = function(){
   Matter.Events.on(this.engine, 'collisionStart', function(evt){
     var str = evt.pairs[0].id; //get collision pairs 
     _self.itemCollisionCheck(str); //get collision type (item, block, etc.)
-    
+    _self.enemyCollisions(str);
     if(_self.currentChar && _self.currentChar.charSpriteset && KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
       _self.currentChar.render.sprite.texture = _self.currentChar.charSpriteset[0];
     }
   });
+}
+
+Game.prototype.enemyCollisions = function(str){
+  //GOOMBAS
+  //check collision with a wall 
+  if(str.indexOf('goomba')){
+    //var goom_id = this.getBodyID('goomba',str);
+    //get the body IDs somehow 
+    var rgx = /A(\w+)\-(\d+)B(\w+)\-(\d+)/g;
+    var m = rgx.exec(str);
+    if(m && m[1] && m[2] && m[3] && m[4]){
+      body_props = { body1:m[1], body2:m[3], id1:(parseInt(m[2])-1), id2:(parseInt(m[4])-1) };
+      //console.log(body_props);
+    }
+    
+    //var brick_id = this.getBodyID('brick', str);
+    //console.log(this.currentLevel.goombas[id]);
+    
+    if(body_props.body1 != null && body_props.body2 != null){
+      var body1 = (body_props.body1 == 'goomba' ? this.currentLevel.goombas[body_props.id1] : this.currentLevel.bricks[body_props.id1]);
+      var body2 = (body_props.body2 == 'goomba' ? this.currentLevel.goombas[body_props.id2] : this.currentLevel.bricks[body_props.id2]);
+      
+      //var brick = this.currentLevel.bricks[brick_id];
+      if(body1 != null && body2 != null && (body1.position.y < (body2.position.y + 4))){
+        if(body_props.body1 == 'goomba'){
+          body1.props.facing = (body1.props.facing == 'left' ? 'right' : 'left');
+        }
+        if(body_props.body2 == 'goomba'){
+          body2.props.facing = (body2.props.facing == 'left' ? 'right' : 'left');
+        }
+      }
+    }
+    
+    /*if(goom_id != null && brick_id != null){
+      var goomba = this.currentLevel.goombas[goom_id];
+      var brick = this.currentLevel.bricks[brick_id];
+      //console.log(goom_id+', '+brick_id);
+      if(brick.position.y < goomba.position.y + 4){
+        goomba.props.facing = (goomba.props.facing == 'left' ? 'right' : 'left');
+      }
+    }*/
+  }
+  //check a collision with another goomba (enemy) 
+  /*if(str.indexOf('goomba')){
+    var m = /Agoomba\-(\d+)Agoomba\-(\d+)/g.exec(str);
+    if(m && m[1] && m[2]){
+      console.log(m);
+    }
+  }*/
+  
 }
 
 Game.prototype.itemCollisionCheck = function(str){
@@ -532,6 +591,8 @@ Game.prototype.jump = function(){
   if(this.currentChar && this.currentChar.jumpState != 'jumping'){
     this.playJumpSnd();
     Matter.Body.applyForce(this.currentChar, this.currentChar.position, {x:0,y:(GLOBALS.char.jumpForce.current*-1)});
+    console.log(this.currentChar.jumpState = 'jumping');
+    console.log(this.currentChar.jumpState);
     this.currentChar.standingOn = 'nothing';
   }
 }

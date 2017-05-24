@@ -9,17 +9,22 @@ function Level(level){
   return {
     name:this.name,
     layout:layout,
+    rows:this.rows,
+    //blocks
     qblocks:this.qblocks,
     pblocks:this.pblocks,
     fblocks:this.fblocks,
     bricks:this.bricks,
     fricks:this.fricks,
+    //items
     coins:this.coins,
     mushrooms:this.mushrooms,
     shrooms:this.shrooms,
     flowers:this.flowers,
-    char:this.character,
-    rows:this.rows
+    //enemies
+    goombas:this.goombas,
+    //character
+    char:this.character
   };
 }
 
@@ -34,6 +39,7 @@ Level.prototype.layout = function(rows){
   var mushroom_count = 0;
   var shroom_count = 0;
   var flower_count = 0;
+  var goomba_count = 0;
   // build level layout based on grid passed in 
   for(var i = 0; i < rows.length; i++){ 
     for(var o = 0; o < rows[i].length; o++){
@@ -78,6 +84,7 @@ Level.prototype.layout = function(rows){
         blocks.push(fblock);
         blocks.push(flower);
       }
+      /* ITEMS */
       if(rows[i][o] == 'm'){
         mushroom_count+=1;
         var mushroom = new Mushroom(i,o,mushroom_count);
@@ -94,6 +101,13 @@ Level.prototype.layout = function(rows){
         this.character = new Character(i,o);
         //blocks.push(char);
       }
+      /* ENEMIES */
+      if(rows[i][o] == 'g'){
+        goomba_count+=1;
+        var goomba = new Goomba(i,o,goomba_count);
+        this.goombas.push(goomba);
+        blocks.push(goomba);
+      }
     }
   }
   // return the layout
@@ -107,6 +121,14 @@ Object.defineProperties(Level.prototype, {
     },
     get: function(){
       return this._name;
+    }
+  },
+  goombas: {
+    get: function(){
+      if(!this._goombas){
+        this._goombas = [];
+      }
+      return this._goombas;
     }
   },
   boxes: {
@@ -209,6 +231,5 @@ Object.defineProperties(Level.prototype, {
     }
   }
 });
-
 
 

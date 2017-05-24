@@ -32,7 +32,7 @@ function Character(i, o){
     }
   });
   this.state = CHAR_SMALL;
-  console.log(this.state);
+  //console.log(this.state);
   return char;
 }
 

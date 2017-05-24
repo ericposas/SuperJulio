@@ -3,7 +3,7 @@
   Mario-clone project, using Matter.js.. There will be violence 
   
   ### Known issues: 
-    - Infinite jump happens if you press SPACEBAR and then jump and hold the jump key 
+    - When I added in the Goomba collision check/animation, it screwed up Julio's jumping 
     - Julio stops walking motion, if he reaches the scrolling boundary, but not touching a wall (will be solved when I switch to the background canvas rendering) 
   
   ### Need to do: 

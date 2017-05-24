@@ -31,7 +31,7 @@ function Keys(){
 Keys.prototype.construct = function(){
   document.body.addEventListener('keydown', this.keysdown.bind(this));
   document.body.addEventListener('keyup', this.keysup.bind(this));
-  document.body.addEventListener('keypress', this.spbarpress.bind(this));
+  document.body.addEventListener('keypress', this.keypresses.bind(this));
 }
 
 
@@ -39,7 +39,7 @@ Keys.prototype.construct = function(){
    SPACEBAR
 *************/
 
-Keys.prototype.spbarpress = function(evt){
+Keys.prototype.keypresses = function(evt){
   evt.preventDefault();
   if(evt.keyCode == KEYCODES.spacebar){
     this.game.char_throwFireBall();
@@ -86,6 +86,9 @@ Keys.prototype.keysup = function(e){
     this.game.decelerate('left');
     //this.game.currentChar.render.sprite.texture = this.game.currentChar.charSpriteset[0];
   }
+  /*if(e.keyCode == KEYCODES.spacebar){
+    e.preventDefault();
+  }*/
 }
 
 /*************
