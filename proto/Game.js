@@ -163,9 +163,9 @@ Game.prototype.collisions = function(){
   Matter.Events.on(this.engine, 'collisionStart', function(evt){
     var str = evt.pairs[0].id; //get collision pairs 
     //get collision type (item, block, etc.)
-    if(_self.itemCollisionCheck(str) != false){
-      _self.enemyCollisions(str);
-    }
+    _self.itemCollisionCheck(str);
+    _self.enemyCollisions(str);
+    
     if(_self.currentChar && _self.currentChar.charSpriteset && KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
       _self.currentChar.render.sprite.texture = _self.currentChar.charSpriteset[0];
     }
