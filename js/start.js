@@ -12,7 +12,7 @@ window.onload = function(){
   var lvl1 = new Level(Levels.level1);
   var Hannah = new Level(Levels.level2);
   
-  game.addLevel(lvl1);
+  game.addLevel(Hannah);
   game.start();
   game.w = 480;
   game.h = 800;

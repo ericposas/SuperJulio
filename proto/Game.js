@@ -36,6 +36,8 @@ Game.prototype.start = function(){
   this.gameLoop();
   // collisions  
   this.collisions();
+  // enemies
+  //this.animateEnemies();
   // setting canvas and context in case we want to draw over our scene 
   // -maybe we'll use this for drawing the game's GUI elements (score, coin count, etc.) 
   this.canv = document.getElementsByTagName('canvas')[0];
@@ -65,10 +67,26 @@ Game.prototype.gameLoop = function(){
 
 // Include enemies to game loop 
 Game.prototype.animateEnemies = function(){
-  for(var i = 0, goombas = this.currentLevel.goombas; i < goombas.length; i+=1){
-    Matter.Body.translate(goombas[i], {x:(goombas[i].props.facing == 'left' ? -1 : 1),y:-1});
-  }
   
+  for(var i = 0, goombas = this.currentLevel.goombas; i < goombas.length; i+=1){
+    //if any goomba is at an x position that's less than the x position of the very first brick 
+    if((goombas[i].position.x < this.currentLevel.bricks[0].position.x + 40)){
+      goombas[i].props.facing = 'right';
+    }
+    //if any goomba is at an x pos that's more than the x pos of the very last brick 
+    if((goombas[i].position.x > this.currentLevel.bricks[this.currentLevel.bricks.length-1].position.x - 40)){
+      goombas[i].props.facing = 'left';
+    }
+    //console.log(goombas[3].position.y); 660
+    //animate our goombas either right or left, depending on the above calculation 
+    if(goombas[i].props.state != 'dead'){
+      Matter.Body.translate(goombas[i], {
+        x:(goombas[i].props.facing == 'left' ? -1 : 1),
+        y:0 //(goombas[i].position.y < 660 ? 1 : 0)
+      });
+    }
+    
+  }
 }
 
 // Render canvas elements (outside of matter.js bodies)
@@ -163,7 +181,7 @@ Game.prototype.collisions = function(){
   Matter.Events.on(this.engine, 'collisionStart', function(evt){
     var str = evt.pairs[0].id; //get collision pairs 
     //get collision type (item, block, etc.)
-    _self.itemCollisionCheck(str);
+    _self.collisionCheck(str); 
     _self.enemyCollisions(str);
     
     if(_self.currentChar && _self.currentChar.charSpriteset && KEYSTATES.leftarrow != 'down' && KEYSTATES.rightarrow != 'down'){
@@ -173,9 +191,8 @@ Game.prototype.collisions = function(){
 }
 
 Game.prototype.enemyCollisions = function(str){
-  //GOOMBAS
-  //check for goomba collision 
-  if(str.indexOf('goomba')){
+  if(str.indexOf('goomnba')){
+    //GOOMBAS
     // get the body types and ids, and store them in 'body_props' object 
     var rgx = /A(\w+)\-(\d+)B(\w+)\-(\d+)/g;
     var m = rgx.exec(str);
@@ -186,7 +203,6 @@ Game.prototype.enemyCollisions = function(str){
         id1: m[2],
         id2: m[4]
       };
-      //console.log(body_props);
     }
     // if we have both bodies, test for goombas 
     if(body_props.body1 != null && body_props.body2 != null){
@@ -208,24 +224,57 @@ Game.prototype.enemyCollisions = function(str){
       })();
       
       if(body1 != null && body2 != null){
-        if(body_props.body1 == 'goomba' && (body2.position.y < (body1.position.y + 4))){
+        //console.log(body1 + ', ' + body2);
+        /*if(body_props.body1 == 'goomba' && (body2.position.y < (body1.position.y + 4))){
           body1.props.facing = (body1.props.facing == 'left' ? 'right' : 'left');
         }
         if(body_props.body2 == 'goomba' && (body1.position.y < (body2.position.y + 4))){
           body2.props.facing = (body2.props.facing == 'left' ? 'right' : 'left');
+        }*/
+        if(body_props.body1 == 'character' && body_props.body2 == 'goomba'){
+          if(body1.position.y < body2.position.y){
+            //game.removeBody(body2);
+            body2.collisionFilter = { mask:CollisionCategories.masked };
+            body2.props.state = 'dead';
+            killGoomba(body2);
+          }else{
+            console.log('character got hit!');
+          }
         }
-        if((body_props.body1 == 'character' && body_props.body2 == 'goomba') ||
-           (body_props.body1 == 'goomba' && body_props.body2 == 'character')){
-          //Now, I need to see if the character simply ran into a goomba, or if Julio stomped on a goomba 
-          console.log('goomba!');
+        if(body_props.body2 == 'character' && body_props.body1 == 'goomba'){
+          if(body2.position.y < body1.position.y){
+            //game.removeBody(body1);
+            body1.collisionFilter = { mask:CollisionCategories.masked };
+            body1.props.state = 'dead';
+            killGoomba(body1);
+          }else{
+            console.log('character got hit!');
+          }
         }
+        function killGoomba(goomba){
+          goomba.render.sprite.xScale = 0.4;
+          goomba.render.sprite.yScale = 0.075;
+          goomba.position.y = 676;
+          if(goomba.removing != 'removing'){
+            var goom = goomba;
+            TweenLite.delayedCall(1, function(){
+              goom.removing = 'removing';
+              if(goom){
+                game.removeBody(goom);
+                console.log(goom.id+' removed.');
+                console.log(game.currentLevel.goombas); //'goombas' array still holds a reference to the matter.js body (goomba) 
+              }
+            });
+          }
+        }
+        
       }
     }
   }
   
 }
 
-Game.prototype.itemCollisionCheck = function(str){
+Game.prototype.collisionCheck = function(str){
   //loop thru and check for collisions on on all brick types 
   if(this.currentChar && (str.indexOf(this.currentChar.id))){
     for(var i = 0; i < this.item_types.length; i++){
@@ -270,6 +319,14 @@ Game.prototype.hitBlock = function(type, item){
       default:
         return false;
     }
+  }
+}
+
+Game.prototype.isItem = function(item){
+  if(item == 'coin' || item == 'mushroom' || item == 'shroom' || item == 'flower'){
+    return true;
+  }else{
+    return false;
   }
 }
 

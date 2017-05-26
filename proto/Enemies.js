@@ -4,10 +4,12 @@
 
 // GOOMBA // g
 function Goomba (i, o, _count){
+  this._count = _count;
   this.goomba = Matter.Bodies.rectangle((o*40)+20, (i*40)+20, 40, 40, {
     id: 'goomba-'+_count,
-    isStatic: false,
-    inertia: Infinity,
+    count: _count,
+    isStatic: true,
+    //inertia: Infinity,
     friction: 0,
     render: {
       sprite: {
@@ -16,7 +18,8 @@ function Goomba (i, o, _count){
       }
     }
   });
-  this.feetRate = 0.35;
+  this.walk_frames = 0;
+  this.feetRate = 0.025;
   //set 'texture' property to our enemy sprite
   this.texture = Enemy_Sprites.goomba[0];
   //set the physics object texture to the 'texture' prop 
@@ -28,24 +31,43 @@ function Goomba (i, o, _count){
     state: this.state,
     facing: this.facing,
     texture: this.texture,
-    alternateFeet: this.alternateFeet()
+    last_x: this.last_x,
+    walk: this.walk()
   }
   return this.goomba;
 }
 
-Goomba.prototype.alternateFeet = function(){ 
+Goomba.prototype.walk = function(){ 
   //'walk' the sprite (animation)
   var _self = this;
-  if(this.state != 'dead'){
-    TweenLite.delayedCall(this.feetRate, function(){
-      //console.log(_self.state);
+  TweenLite.delayedCall(this.feetRate, function(){
+    _self.walk_frames++;
+    if((_self.walk_frames > 8) &&
+       (game.currentLevel.goombas[_self._count-1].props.state != 'dead')){
       _self.texture = (_self.texture == Enemy_Sprites.goomba[0] ? Enemy_Sprites.goomba[1] : Enemy_Sprites.goomba[0]);
-      _self.alternateFeet();
-    });
-  }
+      _self.walk_frames = 0;
+    }
+    _self.walk();
+  });
 }
 
 Object.defineProperties(Goomba.prototype, {
+  walk_frames: {
+    set: function(v){
+      this._walk_frames = v;
+    },
+    get: function(){
+      return this._walk_frames;
+    }
+  },
+  last_x: {
+    set: function(v){
+      this._last_x = v;
+    },
+    get: function(){
+      return this._last_x;
+    }
+  },
   state: {
     set: function(v){
       this._state = v;
