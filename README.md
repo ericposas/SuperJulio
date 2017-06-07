@@ -1,6 +1,6 @@
 # Super Julio
 
-  Mario-clone project, using Matter.js.. There will be violence 
+  Mario-clone project, using Matter.js 
   
   ### Known issues: 
     - Brick-breaking seems off (not-consistent) since adding the enemy collision checks 
